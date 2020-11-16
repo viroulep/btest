@@ -29,7 +29,8 @@ development:
   # To create additional roles in postgres see `$ createuser --help`.
   # When left blank, postgres will use the default role. This is
   # the same name as the operating system user that initialized the database.
-  #username: btest
+  username: speedcubingfrance
+  password: fas
 
   # The password associated with the postgres role (username).
   #password:
@@ -58,6 +59,8 @@ development:
 test:
   <<: *default
   database: btest_test
+  username: speedcubingfrance
+  password: fas
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
