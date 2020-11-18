@@ -4,6 +4,8 @@ Rails.application.routes.draw do
     resources :users, only: [:index, :show]
     get '/me' => 'users#me'
 
-    resources :games, only: [:show]
+    resources :games, only: [:index, :show] do
+      get '/attempt' => 'games#attempt'
+    end
   end
 end

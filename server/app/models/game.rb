@@ -28,11 +28,15 @@ class Game < ApplicationRecord
   end
 
   def finished_tracks
-    current_track > 0 ? tracks.first(current_track - 1) : []
+    current_track >= 0 ? tracks.first(current_track).reverse : []
+  end
+
+  def has_active_track?
+    running? && current_track >= 0
   end
 
   def find_or_create_answer_for!(user)
-    return nil unless running?
+    return nil unless has_active_track?
 
     existing = user.answers.find_by(game: self, track_index: current_track)
     return existing if existing
@@ -46,6 +50,24 @@ class Game < ApplicationRecord
       userable: user,
     }
     answers.create!(attrs)
+  end
+
+  def answers_for(user)
+    answers.where(userable: user).order(track_index: :desc)
+  end
+
+  def rankings
+    answers.includes(:userable)
+      .where('total_points > 0')
+      .group_by(&:userable)
+      .map do |user, valid|
+      {
+        name: user.name,
+        id: user.id,
+        anonymous: user.anonymous?,
+        points: valid.sum(&:total_points),
+      }
+    end.sort_by! { |a| -a[:points] }
   end
 
   def rank_correct_answers(track_index)

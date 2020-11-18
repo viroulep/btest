@@ -8,7 +8,7 @@ class Answer < ApplicationRecord
   # with it!
   # returns a boolean with a reason. (true if something validated, false if
   # nothing worked)
-  def process_attempt(s)
+  def process_attempt!(s)
     # FIXME: we may want to put this as parameter and create it soon in the
     # controller.
     attempt_time = Time.now
@@ -59,13 +59,13 @@ class Answer < ApplicationRecord
     title_parts.empty?
   end
 
+  def delay_or_nil
+    (validated_at - track_started_at) if correct?
+  end
+
   # Returns true if the title was found fast (arbitrarily set to 10 seconds)
   def fast?
-    if correct?
-      (validated_at - track_started_at) < FAST_DELAY
-    else
-      false
-    end
+    (delay_or_nil || FAST_DELAY) < FAST_DELAY
   end
 
   private def set_total_points
