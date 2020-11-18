@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import logo from './logo.svg';
 import _ from 'lodash';
 import useLoadedData from './requests/loadable';
@@ -31,24 +31,53 @@ const Game = ({
   } = useLoadedData(
     gameUrl(gameId),
   );
+
+  const [slug, setSlug] = useState(null);
+  const [tracks, setTracks] = useState([]);
+  // TODO: somehow merge joined and rankings!
+  // idea: during ranking generation, set "is_connected" based on the
+  // 'game_userable' table!
+  const [joined, setJoined] = useState([]);
+  const [rankings, setRankings] = useState([]);
+  const [current, setCurrent] = useState(0);
+
+  const setStateFromData = useCallback((data) => {
+    if (!data) return;
+    setSlug(data.slug);
+    setTracks(data.tracks);
+    setRankings(data.rankings);
+    setJoined(data.joined);
+    setCurrent(data.current_track);
+  }, [setTracks, setRankings, setCurrent]);
+
+  // Set the initial game state when available/synced
+  useEffect(() => setStateFromData(data), [data]);
+
   useEffect(() => {
+    if (slug === null)
+      return;
     // unsubscribe/subscribe
-    console.log("gameId has changed to: " + gameId);
-    consumer.subscriptions.create({
+    console.log("gameId has changed to: " + slug);
+    const sub = consumer.subscriptions.create({
       channel: "GameChannel",
-      id: gameId,
+      id: slug,
     }, {
       received(data) {
         console.log("received some data");
         console.log(data);
+        if (data.action === "users_updated") {
+          setJoined(data.users);
+        }
       },
     })
     return () => {
-      console.log("cleanup for: " + gameId);
+      if (slug === null)
+        return;
+      consumer.subscriptions.remove(sub);
+      console.log("cleanup for: " + slug);
     };
-  }, [gameId]);
-  console.log(gameId);
-  console.log(data);
+  }, [slug]);
+
   return (
     <div>
       {error && (
@@ -57,20 +86,26 @@ const Game = ({
       {loading && (
         <p>loading</p>
       )}
-      {!loading && data && (
+      {slug && (
         <>
-          <h2>Selected game: {data.slug}</h2>
+          <h2>Selected game: {slug}</h2>
           <h3>State</h3>
-          <p>{data.current_track + 1}/15</p>
+          <p>{current + 1}/15</p>
+          <h3>Users</h3>
+          <ul>
+            {joined.map((v, k) => (
+              <li key={k}>{v.name}</li>
+            ))}
+          </ul>
           <h3>Rankings</h3>
           <ol>
-            {data.rankings.map((v, k) => (
+            {rankings.map((v, k) => (
               <li key={k}>{v.name} ({v.points} points)</li>
             ))}
           </ol>
           <h3>Past songs</h3>
           <ul>
-            {data.tracks.map((v, k) => (
+            {tracks.map((v, k) => (
               <li key={k}><img src={v.cover_url} /><b>{v.title}</b> - <b>{v.artist}</b></li>
             ))}
           </ul>

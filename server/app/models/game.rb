@@ -35,6 +35,10 @@ class Game < ApplicationRecord
     running? && current_track >= 0
   end
 
+  def user_connected
+    [User.last]
+  end
+
   def find_or_create_answer_for!(user)
     return nil unless has_active_track?
 
@@ -96,6 +100,7 @@ class Game < ApplicationRecord
       # FIXME: create a tracklist object
       tracks = Tracklist.from_deezer(data)
       puts "there are #{tracks.size} songs"
+      # FIXME: make sure slug is unique!
       [Game.create!(slug: Game.generate_slug, tracks: tracks), nil]
     rescue RestClient::ExceptionWithResponse => err
       [nil, err]
