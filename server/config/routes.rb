@@ -5,7 +5,10 @@ Rails.application.routes.draw do
     get '/me' => 'users#me'
 
     resources :games, only: [:index, :show] do
-      get '/attempt' => 'games#attempt'
+      post '/attempt' => 'games#attempt'
+      get '/start' => 'games#start'
+      get '/abort' => 'games#abort'
+      get '/next/:token' => 'games#next', as: :next
     end
   end
 end

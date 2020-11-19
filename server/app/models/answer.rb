@@ -68,6 +68,18 @@ class Answer < ApplicationRecord
     (delay_or_nil || FAST_DELAY) < FAST_DELAY
   end
 
+  def to_json
+    {
+      track_index: track_index,
+      total_points: total_points,
+      worthy_position: worthy_position,
+      fast: fast?,
+      artist: correct_artist?,
+      title: correct_title?,
+      delay: delay_or_nil,
+    }
+  end
+
   private def set_total_points
     # Base point
     total = [correct?, correct_title?, correct_artist?].count(true)

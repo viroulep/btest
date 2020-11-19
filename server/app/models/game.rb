@@ -1,6 +1,6 @@
 class Game < ApplicationRecord
   SONG_SOURCE="https://api.deezer.com/radio/38325/tracks"
-  START_DELAY = 15.seconds
+  START_DELAY = 5.seconds
   SONG_DURATION = 30.seconds
   SONG_DELAY = 5.seconds
 
@@ -35,10 +35,6 @@ class Game < ApplicationRecord
     running? && current_track >= 0
   end
 
-  def user_connected
-    [User.last]
-  end
-
   def find_or_create_answer_for!(user)
     return nil unless has_active_track?
 
@@ -56,6 +52,7 @@ class Game < ApplicationRecord
     answers.create!(attrs)
   end
 
+  # TODO: needed?
   def answers_for(user)
     answers.where(userable: user).order(track_index: :desc)
   end
@@ -85,6 +82,17 @@ class Game < ApplicationRecord
     correct_answers.each.with_index(1) do |a, pos|
       a.update(worthy_position: pos)
     end
+  end
+
+  def to_json
+    {
+      slug: slug,
+      current_track: current_track,
+      rankings: rankings,
+      tracks: finished_tracks,
+      # fixme: remove that...
+      current: tracks[current_track].to_json,
+    }
   end
 
   def self.generate_slug

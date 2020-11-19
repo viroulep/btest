@@ -4,16 +4,14 @@ class GameChannel < ApplicationCable::Channel
     game = Game.find_by_slug!(params[:id])
     stream_for game
     GameChannel.broadcast_to(game, {
-      action: "users_updated",
-      users: game.user_connected.append(current_user),
+      rankings: game.rankings,
     })
   end
 
   def unsubscribed
     game = Game.find_by_slug!(params[:id])
     GameChannel.broadcast_to(game, {
-      action: "users_updated",
-      users: game.user_connected,
+      rankings: game.rankings,
     })
   end
 end
