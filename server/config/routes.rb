@@ -4,11 +4,12 @@ Rails.application.routes.draw do
     resources :users, only: [:index, :show]
     get '/me' => 'users#me'
 
-    resources :games, only: [:index, :show] do
+    resources :games, only: [:index, :show, :create] do
       post '/attempt' => 'games#attempt'
-      get '/start' => 'games#start'
-      get '/abort' => 'games#abort'
-      get '/next/:token' => 'games#next', as: :next
+      post '/start' => 'games#start'
+      post '/next' => 'games#next', as: :next
+      post '/abort' => 'games#abort'
+      get '/mine' => 'games#mine'
     end
   end
 end

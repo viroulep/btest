@@ -5,7 +5,6 @@ export function fetchJsonOrError(url, fetchOptions = {}) {
     mode: 'cors',
     credentials: 'include',
   };
-  console.log(fetchOptions);
   return fetch(url, fetchOptions)
     .then((response) => response.json()
       .then((json) => {

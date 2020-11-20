@@ -3,6 +3,7 @@ class GameChannel < ApplicationCable::Channel
     # TODO: if user-restricted game, one can use 'reject' to reject it
     game = Game.find_by_slug!(params[:id])
     stream_for game
+    game.add_active_user(current_user)
     GameChannel.broadcast_to(game, {
       rankings: game.rankings,
     })
@@ -10,6 +11,7 @@ class GameChannel < ApplicationCable::Channel
 
   def unsubscribed
     game = Game.find_by_slug!(params[:id])
+    game.remove_active_user(current_user)
     GameChannel.broadcast_to(game, {
       rankings: game.rankings,
     })

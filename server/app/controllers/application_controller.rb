@@ -11,12 +11,12 @@ class ApplicationController < ActionController::API
   }
 
   def current_anonymous
-    @current_anonymous ||= AnonymousUser.find(cookies.encrypted[:anonymous_user_id]) if cookies.encrypted[:anonymous_user_id]
+    @current_anonymous ||= AnonymousUser.find_by(id: cookies.encrypted[:anonymous_user_id])
   end
 
   def current_user
     begin
-      @current_user ||= User.find(cookies.encrypted[:user_id]) if cookies.encrypted[:user_id]
+      @current_user ||= User.find_by(id: cookies.encrypted[:user_id])
     rescue Exception => e
       nil
     end

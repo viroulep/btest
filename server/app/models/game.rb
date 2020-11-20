@@ -6,6 +6,7 @@ class Game < ApplicationRecord
 
   serialize :tracks, Tracklist
   has_many :answers
+  after_save :post_game_cleanup, if: :saved_change_to_finished_at?
 
   def available?
     !(aborted? || finished?)
@@ -52,21 +53,38 @@ class Game < ApplicationRecord
     answers.create!(attrs)
   end
 
-  # TODO: needed?
+  def add_active_user(user)
+    return unless available?
+    answers.create!({
+      artist_parts: [],
+      title_parts: [],
+      track_index: -1,
+      track_started_at: Time.now,
+      userable: user,
+    })
+  end
+
+  def remove_active_user(user)
+    answers.where(userable: user, track_index: -1).destroy_all
+  end
+
   def answers_for(user)
-    answers.where(userable: user).order(track_index: :desc)
+    answers.where(userable: user)
+      .where.not(track_index: -1)
+      .order(track_index: :desc)
   end
 
   def rankings
     answers.includes(:userable)
-      .where('total_points > 0')
       .group_by(&:userable)
       .map do |user, valid|
+      current_answer = valid.find { |a| a.track_index == current_track }&.to_json if current_track >= 0
       {
         name: user.name,
         id: user.id,
         anonymous: user.anonymous?,
         points: valid.sum(&:total_points),
+        current: current_answer,
       }
     end.sort_by! { |a| -a[:points] }
   end
@@ -103,8 +121,10 @@ class Game < ApplicationRecord
     # FIXME: proper "music source" class with providers
     # for testing purpose, this is the "2000" mix
     begin
-      mix = RestClient.get("https://api.deezer.com/radio/38325/tracks?limit=15")
+      # Request 50, because the 15 first tend to be very similar
+      mix = RestClient.get("https://api.deezer.com/radio/38325/tracks?limit=50")
       data = JSON.parse(mix.body)
+      data["data"] = data["data"].shuffle.first(15)
       # FIXME: create a tracklist object
       tracks = Tracklist.from_deezer(data)
       puts "there are #{tracks.size} songs"
@@ -113,5 +133,11 @@ class Game < ApplicationRecord
     rescue RestClient::ExceptionWithResponse => err
       [nil, err]
     end
+  end
+
+  private def post_game_cleanup
+    return unless finished_at
+    # Remove any active user
+    answers.where(track_index: -1).destroy_all
   end
 end

@@ -9,6 +9,8 @@ module StringTransform
     # complement song titles).
     s.gsub!(/\([^)]*\)/, '')
 
+    # TODO: remove also "[some text]"
+
     # Turn any non alphanumeric char into blanks
     s.gsub!(/[^0-9a-zA-Z]/, ' ')
 

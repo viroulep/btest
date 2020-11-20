@@ -7,8 +7,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    # FIXME: change this to know hosts when in prod
-    origins 'localhost:3000'
+    origins ENVied.CLIENT_ORIGIN
 
     # FIXME: make sure the credentials true works for us only
     resource '*',

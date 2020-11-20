@@ -8,11 +8,11 @@ class Answer < ApplicationRecord
   # with it!
   # returns a boolean with a reason. (true if something validated, false if
   # nothing worked)
-  def process_attempt!(s)
-    # FIXME: we may want to put this as parameter and create it soon in the
-    # controller.
-    attempt_time = Time.now
-    return [false, "You are too late!"] if (attempt_time - track_started_at) > 30
+  def process_attempt!(s, timestamp)
+    # Let one more second for the delay
+    if (timestamp - track_started_at) > Game::SONG_DURATION + 1
+      return [false, "You are too late!"]
+    end
 
     return [false, "You already found all about this song."] if correct?
 
@@ -31,12 +31,14 @@ class Answer < ApplicationRecord
     end
 
     if correct?
-      self.validated_at = attempt_time
+      self.validated_at = timestamp
     end
 
     save!
 
     if correct?
+      # We may have to update top3!
+      game.rank_correct_answers(track_index)
       return [true, "Great job, you got everything!"]
     elsif newly_found_title
       return [true, "You just need the artist now!"]
@@ -81,6 +83,7 @@ class Answer < ApplicationRecord
   end
 
   private def set_total_points
+    return if track_index < 0
     # Base point
     total = [correct?, correct_title?, correct_artist?].count(true)
 

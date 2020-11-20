@@ -64,6 +64,8 @@ GEM
     crass (1.0.6)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
+    envied (0.9.3)
+      thor (~> 0.15)
     erubi (1.10.0)
     ffi (1.13.1)
     globalid (0.4.2)
@@ -136,7 +138,7 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    redis (4.2.3)
+    redis (4.2.5)
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
       http-cookie (>= 1.0.2, < 2.0)
@@ -153,7 +155,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    thor (1.0.1)
+    thor (0.20.3)
     thread_safe (0.3.6)
     tzinfo (1.2.8)
       thread_safe (~> 0.1)
@@ -171,6 +173,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap (>= 1.4.2)
   byebug
+  envied (~> 0.9.3)
   jbuilder (~> 2.7)
   listen (~> 3.2)
   pg (>= 0.18, < 2.0)
@@ -178,7 +181,7 @@ DEPENDENCIES
   rack-cors
   rails (~> 6.0.3, >= 6.0.3.4)
   redis (~> 4.0)
-  rest-client
+  rest-client (~> 2.1)
   spring
   spring-watcher-listen (~> 2.0.0)
   tzinfo-data

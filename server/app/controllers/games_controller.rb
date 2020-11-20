@@ -1,10 +1,20 @@
 class GamesController < ApplicationController
   skip_before_action :sign_in_or_anon!, only: [:next]
 
-  SECRET_TOKEN="TODO"
+  TOKEN = ENVied.GAMES_SECRET.freeze
+
   # TODO: make this admin only?
   def index
     @games = Game.all.order(created_at: :desc)
+  end
+
+  # TODO: user management
+  def create
+    game, err = Game.create_one!
+    render json: {
+      success: err.nil?,
+      message: err ? err : "Created game #{game.slug}",
+    }
   end
 
   def show
@@ -19,11 +29,20 @@ class GamesController < ApplicationController
     end
     # Start game and return
     game.update!(started_at: Time.now)
-    GameStepJob.set(wait: Game::START_DELAY).perform_later(game_next_url(game.slug, SECRET_TOKEN))
+    GameStepJob.set(wait: Game::START_DELAY).perform_later(game_next_url(game.slug))
     GameChannel.broadcast_to(game, {
       action: "game_started",
     })
     return render json: { success: true, message: "Started" }
+  end
+
+  def mine
+    game = Game.find_by_slug!(params[:game_id])
+    answers_by_index = game.answers_for(current_user)
+      .group_by(&:track_index).map do |i, a|
+      [i, a.first.to_json]
+    end.to_h
+    render json: answers_by_index
   end
 
   def abort
@@ -37,9 +56,9 @@ class GamesController < ApplicationController
 
   def next
     # TODO: maybe do nothing if a job is already in the queue!
-    game = Game.find_by_slug!(params[:game_id])
+    game = Game.find_by_slug!(params.require([:game_id]))
     token = params.require(:token)
-    unless token == SECRET_TOKEN
+    unless token == TOKEN
       raise ActiveRecord::RecordNotFound
     end
 
@@ -65,7 +84,7 @@ class GamesController < ApplicationController
       })
 
       # Set next step
-      GameStepJob.set(wait: Game::SONG_DURATION + Game::SONG_DELAY).perform_later(game_next_url(game.slug, SECRET_TOKEN))
+      GameStepJob.set(wait: Game::SONG_DURATION + Game::SONG_DELAY).perform_later(game_next_url(game.slug))
     else
       # Finish the game
       game.update!(finished_at: Time.now)
@@ -88,10 +107,8 @@ class GamesController < ApplicationController
         message: "Game is not going on",
       }
     end
-    puts "answer:"
-    puts answer.to_json
 
-    res, msg = answer.process_attempt!(query)
+    res, msg = answer.process_attempt!(query, attempt_timestamp)
 
     if res
       # Broadcast new rankings
@@ -99,7 +116,6 @@ class GamesController < ApplicationController
         rankings: game.rankings,
       })
     end
-    puts "coucou: #{msg}"
 
     render json: {
       success: res,

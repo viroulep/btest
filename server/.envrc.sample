@@ -1,0 +1,4 @@
+# These are some good default for development
+
+export CLIENT_ORIGIN="localhost:3000"
+export GAMES_SECRET="secret"
