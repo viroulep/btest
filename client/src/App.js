@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useReducer, useState, useEffect, useCallback, useRef } from 'react';
 import logo from './logo.svg';
 import _ from 'lodash';
 import useLoadedData from './requests/loadable';
 import { fetchJsonOrError } from './requests/fetchJsonOrError';
 import './App.css';
 import consumer from './consumer';
+import Welcome from './components/Welcome/Welcome';
+import Header from './components/Nav/Header';
+import Footer from './components/Nav/Footer';
+import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
+import { AppBar, Grid, Container, CssBaseline, Toolbar, IconButton, Fab } from '@material-ui/core';
 
 const BASE_URL = 'http://localhost:1235';
 const gamesUrl = () => `${BASE_URL}/games`;
@@ -363,6 +369,16 @@ const GlobalMessage = ({
   </p>
 );
 
+const useStyles = makeStyles((theme) => ({
+  main: {
+    height: '100vh',
+    display: 'flex',
+  },
+  grow: {
+    flexGrow: 1,
+  },
+}));
+
 function App() {
   // dark mode: https://www.surajsharma.net/blog/react-material-ui-dark-mode
   // NOTE: we need to make *sure* to load the user before doing anything else!
@@ -373,16 +389,38 @@ function App() {
   // Some global message
   const [msg, setMsg] = useState("");
   // Note: usecontext for "me"
+          //<GlobalMessage message={msg} />
+          //<Games setMsg={setMsg} me={data} />
+  const [theme, toggle] = useReducer((state) => {
+    return state === "light" ? "dark" : "light"
+  }, "light");
+
+  const muiTheme = createMuiTheme({
+    palette: {
+      type: theme,
+    },
+  });
+
+  const classes = useStyles();
+
   return (
-    <div className="App">
-      {data && (
-        <>
-          <p>Welcome {data.name}</p>
-          <GlobalMessage message={msg} />
-          <Games setMsg={setMsg} me={data} />
-        </>
-      )}
-    </div>
+    <ThemeProvider theme={muiTheme}>
+      <CssBaseline />
+      <Grid direction="column" className={classes.main}>
+        <Grid item>
+          <Header user={data} />
+        </Grid>
+        {data && (
+          <Grid item>
+            <Welcome user={data} toggle={toggle} />
+          </Grid>
+        )}
+        <Grid item className={classes.grow} />
+        <Grid item>
+          <Footer toggle={toggle} />
+        </Grid>
+      </Grid>
+    </ThemeProvider>
   );
 }
 
