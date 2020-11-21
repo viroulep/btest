@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Card, CardContent, CardActions, Link } from '@material-ui/core';
+import { Card, CardContent, Link } from '@material-ui/core';
 import { Link as RouterLink } from 'react-router-dom';
 
 const Welcome = ({

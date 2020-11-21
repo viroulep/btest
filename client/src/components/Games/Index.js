@@ -1,16 +1,12 @@
 import React, { useCallback }  from 'react';
 import WithLoading from '../WithLoading/WithLoading';
 import useLoadedData from '../../requests/loadable';
-import { useTheme, withStyles, makeStyles, ThemeProvider } from '@material-ui/core/styles';
-import { Button, Card, CardHeader, CardContent, Container, List, ListItem, Typography } from '@material-ui/core';
+import { Card, CardHeader, CardContent, Container, List, ListItem } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import PositiveButton from '../Buttons/Positive';
-import { green } from '@material-ui/core/colors';
 import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
 import { Link as RouterLink } from 'react-router-dom';
-
-const BASE_URL = 'http://localhost:1235';
-const gamesUrl = () => `${BASE_URL}/games`;
+import { gamesUrl } from '../../requests/routes';
 
 const statusForGame = game => {
   if (game.finished) {
@@ -22,22 +18,8 @@ const statusForGame = game => {
   } else if (game.available) {
     return "will start";
   } else {
-    return "TODO";
+    return "unknown";
   }
-};
-
-const CreateGameButton = ({
-  action
-}) => {
-  return (
-    <PositiveButton
-      variant="contained"
-      onClick={action}
-      startIcon={<AddIcon />}
-    >
-      Create
-    </PositiveButton>
-  );
 };
 
 const GamesList = ({
@@ -45,7 +27,7 @@ const GamesList = ({
 }) => (
   <List>
     {games.map((v, k) => (
-      <ListItem button component={RouterLink} key={k} to={`/game/${v.slug}`}>
+      <ListItem button component={RouterLink} key={k} to={`/games/${v.slug}`}>
         Game #{v.slug} ({statusForGame(v)})
       </ListItem>
     ))}
@@ -62,7 +44,6 @@ const GamesIndex = ({
   const loadedData = useLoadedData(gamesUrl());
   const { data, sync } = loadedData;
 
-
   const createGame = useCallback(() => {
     fetchJsonOrError(gamesUrl(), { method: 'POST' })
       .then((data) => {
@@ -76,7 +57,15 @@ const GamesIndex = ({
       <Card>
         <CardHeader
           title="Games"
-          action={<CreateGameButton action={createGame} />}
+          action={
+            <PositiveButton
+              variant="contained"
+              onClick={createGame}
+              startIcon={<AddIcon />}
+            >
+              Create
+            </PositiveButton>
+          }
         />
         <CardContent>
           <WithLoading Component={GamesList} loadedData={loadedData} games={data} />
