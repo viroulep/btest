@@ -1,6 +1,7 @@
 import React, { useReducer, useState, useEffect } from 'react';
 import Preview from './Preview';
 import Marks from '../Answer/Marks';
+import { Grid } from '@material-ui/core';
 import AnswerForm from '../Answer/Form';
 import PastTracks from './PastTracks';
 import { gameStartUrl, gameStopUrl } from '../../requests/routes';
@@ -128,7 +129,14 @@ const Game = ({
           </li>
         ))}
       </ol>
-      <PastTracks slug={slug} tracks={tracks} />
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <PastTracks slug={slug} tracks={tracks} />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <PastTracks slug={slug} tracks={tracks} />
+        </Grid>
+      </Grid>
     </>
   );
 };

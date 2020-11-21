@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import useLoadedData from '../../requests/loadable';
 import { gameMineUrl } from '../../requests/routes';
-import Marks from '../Answer/Marks';
+import { Box, Grid, Typography } from '@material-ui/core';
+import Track from '../Track/Track';
 
 const PastTracks = ({
   slug,
@@ -22,16 +23,16 @@ const PastTracks = ({
   const lastTrackIndex = tracks.length - 1;
   return (
     <>
-      <h3>Past songs</h3>
-      <ul>
+      <Box mb={1}>
+        <Typography component="h3" variant="h4">Past songs</Typography>
+      </Box>
+      <Grid container direction="column" spacing={1}>
         {tracks.map((v, k) => (
-          <li key={k}>
-            <img alt="album cover" src={v.cover_url} /><b>{v.title}</b> - <b>{v.artist}</b>
-            <br/>
-            <Marks data={myAnswers[lastTrackIndex - k]} />
-          </li>
+          <Grid item key={k}>
+            <Track track={v} answer={myAnswers[lastTrackIndex - k]} />
+          </Grid>
         ))}
-      </ul>
+      </Grid>
     </>
   );
 };
