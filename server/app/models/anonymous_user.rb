@@ -1,5 +1,5 @@
 class AnonymousUser < ApplicationRecord
-  has_many :answers, as: :userable
+  has_many :answers, as: :userable, dependent: :destroy
 
   # FIXME: create some concern to factorize this
   def identifiable_attrs

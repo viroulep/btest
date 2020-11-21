@@ -1,6 +1,6 @@
 class User < ApplicationRecord
-  has_one :deezer_user
-  has_many :answers, as: :userable
+  has_one :deezer_user, dependent: :destroy
+  has_many :answers, as: :userable, dependent: :destroy
 
   # FIXME: create some concern to factorize this
   def identifiable_attrs

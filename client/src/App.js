@@ -8,9 +8,18 @@ import consumer from './consumer';
 import Welcome from './components/Welcome/Welcome';
 import Header from './components/Nav/Header';
 import Footer from './components/Nav/Footer';
+import WithLoading from './components/WithLoading/WithLoading';
+import GamesIndex from './components/Games/Index';
 import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
+import { green } from '@material-ui/core/colors';
 import { ThemeProvider } from '@material-ui/styles';
-import { AppBar, Grid, Container, CssBaseline, Toolbar, IconButton, Fab } from '@material-ui/core';
+import { AppBar, Box, Grid, Container, CssBaseline, Toolbar, IconButton, Fab } from '@material-ui/core';
+import {
+  Switch,
+  Route,
+  Link,
+  useParams,
+} from 'react-router-dom';
 
 const BASE_URL = 'http://localhost:1235';
 const gamesUrl = () => `${BASE_URL}/games`;
@@ -43,7 +52,7 @@ const AnswerForm = ({
 }) => {
   const [value, setValue] = useState("");
   const [status, setStatus] = useState(null);
-  
+
   // Reset on game change
   useEffect(() => {
     setValue("");
@@ -314,12 +323,11 @@ const Game = ({
 const Games = ({
   setMsg,
   me,
+  loadedData,
 }) => {
   const {
     data, loading, error, sync,
-  } = useLoadedData(
-    gamesUrl(),
-  );
+  } = loadedData;
 
   const createGame = useCallback(() => {
     fetchJsonOrError(gamesUrl(), { method: 'POST' })
@@ -369,10 +377,18 @@ const GlobalMessage = ({
   </p>
 );
 
+const GameTest = () => {
+  const { gameId } = useParams();
+  return (
+    <p>Display game with id: {gameId}</p>
+  );
+};
+
 const useStyles = makeStyles((theme) => ({
-  main: {
-    height: '100vh',
+  root: {
     display: 'flex',
+    height: '100vh',
+    flexDirection: 'column',
   },
   grow: {
     flexGrow: 1,
@@ -380,7 +396,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function App() {
-  // dark mode: https://www.surajsharma.net/blog/react-material-ui-dark-mode
   // NOTE: we need to make *sure* to load the user before doing anything else!
   // Failure to do so may result to duplicate anonymous user.
   const {
@@ -403,23 +418,43 @@ function App() {
 
   const classes = useStyles();
 
+  // TODO: extract the main entry point with all the theme + route wrapping
+  // to some "withRoot" hook taking an entry point as parameter.
+
   return (
     <ThemeProvider theme={muiTheme}>
       <CssBaseline />
-      <Grid direction="column" className={classes.main}>
+      <div className={classes.root}>
+      <Grid container direction="column" className={classes.grow}>
         <Grid item>
           <Header user={data} />
         </Grid>
-        {data && (
-          <Grid item>
-            <Welcome user={data} toggle={toggle} />
-          </Grid>
-        )}
+        <Grid item>
+          <Container>
+            <p>msg: {msg}</p>
+            {data ? (
+              <Switch>
+                <Route path="/games">
+                  <GamesIndex me={data} setMsg={setMsg} />
+                </Route>
+                <Route path="/game/:gameId">
+                  <GameTest />
+                </Route>
+                <Route path="/">
+                  <Welcome user={data} toggle={toggle} />
+                </Route>
+              </Switch>
+            ) : (
+              <p>Still loging you in</p>
+            )}
+          </Container>
+        </Grid>
         <Grid item className={classes.grow} />
         <Grid item>
           <Footer toggle={toggle} />
         </Grid>
       </Grid>
+      </div>
     </ThemeProvider>
   );
 }

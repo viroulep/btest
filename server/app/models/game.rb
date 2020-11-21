@@ -5,7 +5,7 @@ class Game < ApplicationRecord
   SONG_DELAY = 5.seconds
 
   serialize :tracks, Tracklist
-  has_many :answers
+  has_many :answers, dependent: :destroy
   after_save :post_game_cleanup, if: :saved_change_to_finished_at?
 
   def available?

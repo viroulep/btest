@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTheme, makeStyles } from '@material-ui/core/styles';
-import { Grid, IconButton, Link } from '@material-ui/core';
+import { Box, Grid, IconButton, Link } from '@material-ui/core';
 import EmojiObjectsIcon from '@material-ui/icons/EmojiObjects';
 import EmojiObjectsOutlinedIcon from '@material-ui/icons/EmojiObjectsOutlined';
 
@@ -14,9 +14,6 @@ const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1,
   },
-  root: {
-    padding: theme.spacing(2),
-  },
 }));
 
 const Footer = ({
@@ -25,7 +22,7 @@ const Footer = ({
   const theme = useTheme();
   const classes = useStyles();
   return (
-    <div className={classes.root}>
+    <Box p={1}>
       <Grid container spacing={1}>
         <Grid item>
           <IconButton
@@ -62,7 +59,7 @@ const Footer = ({
           </Link>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 };
 
