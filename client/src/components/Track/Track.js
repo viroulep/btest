@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'column',
   },
   cover: {
-    minWidth: 100,
+    minWidth: 120,
   },
 }));
 

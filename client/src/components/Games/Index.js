@@ -1,4 +1,4 @@
-import React, { useCallback }  from 'react';
+import React, { useState, useCallback }  from 'react';
 import WithLoading from '../WithLoading/WithLoading';
 import useLoadedData from '../../requests/loadable';
 import { Card, CardHeader, CardContent, Container, List, ListItem } from '@material-ui/core';
@@ -7,6 +7,8 @@ import PositiveButton from '../Buttons/Positive';
 import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
 import { Link as RouterLink } from 'react-router-dom';
 import { gamesUrl } from '../../requests/routes';
+import Snackbar from '../Snackbar/Snack';
+import { updateSnack } from '../../logic/snack';
 
 const statusForGame = game => {
   if (game.finished) {
@@ -38,22 +40,27 @@ const GamesList = ({
 
 
 const GamesIndex = ({
-  setMsg,
   me,
 }) => {
   const loadedData = useLoadedData(gamesUrl());
   const { data, sync } = loadedData;
+  const [snack, setSnack] = useState({
+    open: false,
+    severity: 'success',
+    message: '',
+  });
 
   const createGame = useCallback(() => {
     fetchJsonOrError(gamesUrl(), { method: 'POST' })
       .then((data) => {
-        setMsg(`Success: ${data.success ? "yes" : "no"}, msg: ${data.message}`);
+        updateSnack(data, setSnack);
         sync();
       });
-  }, [setMsg, sync]);
+  }, [setSnack, sync]);
 
   return (
     <Container>
+      <Snackbar snack={snack} setSnack={setSnack} />
       <Card>
         <CardHeader
           title="Games"

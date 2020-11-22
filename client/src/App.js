@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from 'react';
+import React, { useReducer } from 'react';
 import useLoadedData from './requests/loadable';
 import { meUrl } from './requests/routes';
 import './App.css';
@@ -31,7 +31,6 @@ function App() {
     data
   } = useLoadedData(meUrl());
   // Some global message
-  const [msg, setMsg] = useState("");
   const [theme, toggle] = useReducer((state) => {
     return state === "light" ? "dark" : "light"
   }, "light");
@@ -58,14 +57,13 @@ function App() {
         <Grid item>
           <Container>
             <Breadcrumb />
-            <p>msg: {msg}</p>
             {data ? (
               <Switch>
                 <Route path="/games" exact>
-                  <GamesIndex me={data} setMsg={setMsg} />
+                  <GamesIndex me={data} />
                 </Route>
                 <Route path="/games/:gameId">
-                  <GameShow me={data} setMsg={setMsg} />
+                  <GameShow me={data} />
                 </Route>
                 <Route path="/">
                   <Welcome user={data} toggle={toggle} />

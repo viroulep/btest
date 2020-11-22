@@ -29,7 +29,11 @@ class Game < ApplicationRecord
   end
 
   def finished_tracks
-    current_track >= 0 ? tracks.first(current_track).reverse : []
+    if finished?
+      tracks.reverse
+    else
+      current_track >= 0 ? tracks.first(current_track).reverse : []
+    end
   end
 
   def has_active_track?
@@ -108,8 +112,6 @@ class Game < ApplicationRecord
       current_track: current_track,
       rankings: rankings,
       tracks: finished_tracks,
-      # fixme: remove that...
-      current: tracks[current_track].to_json,
     }
   end
 

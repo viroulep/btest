@@ -3,9 +3,6 @@ import { fetchJsonOrError } from '../requests/fetchJsonOrError';
 
 const dispatcher = (state, action) => {
   const { type, data } = action;
-  console.log("dispatcher");
-  console.log(type);
-  console.log(data);
   switch (type) {
     case 'rankings':
       return {
@@ -27,24 +24,15 @@ const currentAnswer = (rankings, me) => {
 };
 
 const stopGame = (slug, setMsg) => {
-  fetchJsonOrError(gameStopUrl(slug), { method: 'POST' })
-    .then((data) => {
-      setMsg(`Success: ${data.success ? "yes" : "no"}, msg: ${data.message}`);
-    });
+  fetchJsonOrError(gameStopUrl(slug), { method: 'POST' }).then(setMsg);
 };
 
 const startGame = (slug, setMsg) => {
-  fetchJsonOrError(gameStartUrl(slug), { method: 'POST' })
-    .then((data) => {
-      setMsg(`Success: ${data.success ? "yes" : "no"}, msg: ${data.message}`);
-    });
+  fetchJsonOrError(gameStartUrl(slug), { method: 'POST' }).then(setMsg);
 };
 
-const handleDataReceived = (data, setMsg, changeState, setPreview) => {
-  console.log("received some data haha");
-  console.log(data);
+const handleDataReceived = (data, changeState, setPreview) => {
   const { rankings, state, preview } = data;
-  console.log(rankings);
   if (rankings) {
     changeState({
       type: 'rankings',
@@ -58,11 +46,15 @@ const handleDataReceived = (data, setMsg, changeState, setPreview) => {
       data: state,
     });
     if (preview) {
-      const { title, artist } = state.current;
-      setMsg(`Cheater mode: received ${title} from ${artist}`);
       setPreview(preview);
     }
   }
 };
 
-export { dispatcher, currentAnswer, startGame, stopGame, handleDataReceived };
+export {
+  dispatcher,
+  currentAnswer,
+  startGame,
+  stopGame,
+  handleDataReceived,
+};

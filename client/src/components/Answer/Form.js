@@ -48,9 +48,6 @@ const AnswerForm = ({
   }, [slug, currentTrack]);
 
   const submitAnswer = useCallback((ev) => {
-    console.log("submitting!");
-    console.log(refTextField.current);
-    console.log(refTextField.current.value);
     ev.preventDefault();
     const query = refTextField.current.value;
     if (query.length <= 0) {

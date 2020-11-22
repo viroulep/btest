@@ -1,4 +1,4 @@
-import React, { useReducer, useState, useEffect } from 'react';
+import React, { useReducer, useCallback, useState, useEffect } from 'react';
 import Preview from './Preview';
 import { Grid } from '@material-ui/core';
 import PastTracks from './PastTracks';
@@ -12,44 +12,50 @@ import {
   startGame,
   stopGame,
 } from '../../logic/game';
+import { updateSnack } from '../../logic/snack';
+import Snackbar from '../Snackbar/Snack';
 
 const Game = ({
   game,
-  setMsg,
   me,
 }) => {
   const [state, changeState] = useReducer(dispatcher, game);
-  const { slug, rankings, tracks, current_track } = state;
   const [preview, setPreview] = useState(null);
+  const [snack, setSnack] = useState({
+    open: false,
+    severity: 'success',
+    message: '',
+  });
+
+  const snackCallback = useCallback((data) => updateSnack(data, setSnack), [setSnack]);
+
+  const { slug, rankings, tracks, current_track } = state;
 
   // The subscription
   useEffect(() => {
     if (!slug)
       return;
-    console.log("gameId has changed to: " + slug);
     const sub = consumer.subscriptions.create({
       channel: "GameChannel",
       id: slug,
     }, {
-      received: (data) => handleDataReceived(data, setMsg, changeState, setPreview),
+      received: (data) => handleDataReceived(data, changeState, setPreview),
     })
     return () => {
       if (!slug)
         return;
       consumer.subscriptions.remove(sub);
-      console.log("cleanup for: " + slug);
     };
-  }, [slug, setMsg, changeState, setPreview]);
-  console.log("game#show");
-  console.log(state);
+  }, [slug, changeState, setPreview]);
   return (
     <>
+      <Snackbar snack={snack} setSnack={setSnack} />
       <h2>
         Selected game: {slug}
-        <button onClick={() => startGame(slug, setMsg)}>
+        <button onClick={() => startGame(slug, snackCallback)}>
           go
         </button>
-        <button onClick={() => stopGame(slug, setMsg)}>
+        <button onClick={() => stopGame(slug, snackCallback)}>
           stop
         </button>
       </h2>

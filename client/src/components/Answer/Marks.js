@@ -10,14 +10,22 @@ import StatusIcon from '../Icons/StatusIcon';
 import FirstIcon from '../Icons/First';
 import SecondIcon from '../Icons/Second';
 import ThirdIcon from '../Icons/Third';
+import RemoveIcon from '@material-ui/icons/Remove';
 import defaultAnswer from './default';
 // FIXME: to the about page I guess
 //<div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
 
-const posToIconMap = {
-  1: FirstIcon,
-  2: SecondIcon,
-  3: ThirdIcon,
+const posToIcon = (pos) => {
+  switch (pos) {
+    case 1:
+      return FirstIcon;
+    case 2:
+      return SecondIcon;
+    case 3:
+      return ThirdIcon;
+    default:
+      return RemoveIcon;
+  }
 };
 
 const useStyles = makeStyles(() => ({
@@ -37,17 +45,15 @@ const Marks = ({
     worthy_position,
   } = data ? data : defaultAnswer;
   const { root } = useStyles();
-  const PosIcon = posToIconMap[worthy_position];
+  const PosIcon = posToIcon(worthy_position);
   return (
     <div className={root}>
       <StatusIcon Component={MicIcon} isValid={artist} />
       <StatusIcon Component={MusicNoteRoundedIcon} isValid={title} />
       <StatusIcon Component={OfflineBoltOutlinedIcon} isValid={fast} />
-      {PosIcon && (
-        <Box ml={0.5}>
-          <PosIcon fontSize="small" />
-        </Box>
-      )}
+      <Box ml={0.5}>
+        <PosIcon fontSize="small" />
+      </Box>
     </div>
   )
 };
