@@ -1,37 +1,23 @@
 import React from 'react';
 
 
-import { Box, SvgIcon, Grid } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import MicIcon from '@material-ui/icons/Mic';
 import MusicNoteRoundedIcon from '@material-ui/icons/MusicNoteRounded';
 import OfflineBoltOutlinedIcon from '@material-ui/icons/OfflineBoltOutlined';
 import StatusIcon from '../Icons/StatusIcon';
-import { ReactComponent as FirstIcon } from '../Icons/first.svg';
-import { ReactComponent as SecondIcon } from '../Icons/second.svg';
-import { ReactComponent as ThirdIcon } from '../Icons/third.svg';
+import FirstIcon from '../Icons/First';
+import SecondIcon from '../Icons/Second';
+import ThirdIcon from '../Icons/Third';
+import defaultAnswer from './default';
 // FIXME: to the about page I guess
 //<div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
 
-const defaultAnswer = {
-  artist: false,
-  title: false,
-  fast: false,
-  worthy_position: 0,
-  total_points: 0,
-};
-
-const posToComponent = pos => {
-  switch (pos) {
-    case 1:
-      return FirstIcon;
-    case 2:
-      return SecondIcon;
-    case 3:
-      return ThirdIcon;
-    default:
-      throw new Error();
-  }
+const posToIconMap = {
+  1: FirstIcon,
+  2: SecondIcon,
+  3: ThirdIcon,
 };
 
 const useStyles = makeStyles(() => ({
@@ -49,21 +35,17 @@ const Marks = ({
     title,
     fast,
     worthy_position,
-    total_points
   } = data ? data : defaultAnswer;
   const { root } = useStyles();
+  const PosIcon = posToIconMap[worthy_position];
   return (
     <div className={root}>
       <StatusIcon Component={MicIcon} isValid={artist} />
       <StatusIcon Component={MusicNoteRoundedIcon} isValid={title} />
       <StatusIcon Component={OfflineBoltOutlinedIcon} isValid={fast} />
-      {worthy_position > 0 && (
+      {PosIcon && (
         <Box ml={0.5}>
-          <SvgIcon
-            fontSize="small"
-            component={posToComponent(worthy_position)}
-            viewBox="0 0 580 430"
-          />
+          <PosIcon fontSize="small" />
         </Box>
       )}
     </div>

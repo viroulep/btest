@@ -1,76 +1,17 @@
 import React, { useReducer, useState, useEffect } from 'react';
 import Preview from './Preview';
-import Marks from '../Answer/Marks';
 import { Grid } from '@material-ui/core';
-import AnswerForm from '../Answer/Form';
 import PastTracks from './PastTracks';
-import { gameStartUrl, gameStopUrl } from '../../requests/routes';
-import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
+import Rankings from './Rankings';
 import consumer from '../../channels/consumer';
-
-const dispatcher = (state, action) => {
-  const { type, data } = action;
-  console.log("dispatcher");
-  console.log(type);
-  console.log(data);
-  switch (type) {
-    case 'rankings':
-      return {
-        ...state,
-        rankings: data,
-      }
-    case 'state':
-      return data;
-    default:
-      throw new Error();
-  }
-};
-
-const currentAnswer = (rankings, me) => {
-  const myRank = rankings.find(el => (
-    el.id === me.id && el.anonymous === me.anonymous
-  ));
-  return myRank ? myRank.current : null;
-};
-
-const stopGame = (slug, setMsg) => {
-  fetchJsonOrError(gameStopUrl(slug), { method: 'POST' })
-    .then((data) => {
-      setMsg(`Success: ${data.success ? "yes" : "no"}, msg: ${data.message}`);
-    });
-};
-
-const startGame = (slug, setMsg) => {
-  fetchJsonOrError(gameStartUrl(slug), { method: 'POST' })
-    .then((data) => {
-      setMsg(`Success: ${data.success ? "yes" : "no"}, msg: ${data.message}`);
-    });
-};
-
-const handleReceive = (data, setMsg, changeState, setPreview) => {
-  console.log("received some data haha");
-  console.log(data);
-  const { rankings, state, preview } = data;
-  console.log(rankings);
-  if (rankings) {
-    changeState({
-      type: 'rankings',
-      data: rankings,
-    });
-  }
-  if (state) {
-    // If we receive a full state it's a sync from the server.
-    changeState({
-      type: 'state',
-      data: state,
-    });
-    if (preview) {
-      const { title, artist } = state.current;
-      setMsg(`Cheater mode: received ${title} from ${artist}`);
-      setPreview(preview);
-    }
-  }
-};
+import GameState from './State';
+import {
+  dispatcher,
+  currentAnswer,
+  handleDataReceived,
+  startGame,
+  stopGame,
+} from '../../logic/game';
 
 const Game = ({
   game,
@@ -90,7 +31,7 @@ const Game = ({
       channel: "GameChannel",
       id: slug,
     }, {
-      received: (data) => handleReceive(data, setMsg, changeState, setPreview),
+      received: (data) => handleDataReceived(data, setMsg, changeState, setPreview),
     })
     return () => {
       if (!slug)
@@ -112,26 +53,17 @@ const Game = ({
           stop
         </button>
       </h2>
-      <h3>State</h3>
       <Preview preview={preview} />
-      <p>{current_track + 1}/15</p>
-      <AnswerForm slug={slug} currentTrack={current_track} />
-      <div>
-        Current answer:
-        <Marks data={currentAnswer(rankings, me)} />
-      </div>
-      <h3>Rankings</h3>
-      <ol>
-        {rankings.map((v, k) => (
-          <li key={k}>
-            {v.name} ({v.points} points)
-            (marks: <Marks data={v.current} />)
-          </li>
-        ))}
-      </ol>
       <Grid container spacing={3}>
+        <Grid container item xs={12}>
+          <GameState
+            currentTrack={current_track}
+            slug={slug}
+            currentAnswer={currentAnswer(rankings, me)}
+          />
+        </Grid>
         <Grid item xs={12} md={6}>
-          <PastTracks slug={slug} tracks={tracks} />
+          <Rankings rankings={rankings} />
         </Grid>
         <Grid item xs={12} md={6}>
           <PastTracks slug={slug} tracks={tracks} />
