@@ -1,7 +1,7 @@
 import React, { useState, useCallback }  from 'react';
 import WithLoading from '../WithLoading/WithLoading';
 import useLoadedData from '../../requests/loadable';
-import { Card, CardHeader, CardContent, Container, List, ListItem } from '@material-ui/core';
+import { Card, CardHeader, CardContent, List, ListItem } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import PositiveButton from '../Buttons/Positive';
 import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
@@ -44,7 +44,7 @@ const GamesIndex = ({
   }, [setSnack, sync]);
 
   return (
-    <Container>
+    <>
       <Snackbar snack={snack} setSnack={setSnack} />
       <Card>
         <CardHeader
@@ -63,7 +63,7 @@ const GamesIndex = ({
           <WithLoading Component={GamesList} loadedData={loadedData} games={data} />
         </CardContent>
       </Card>
-    </Container>
+    </>
   );
 };
 

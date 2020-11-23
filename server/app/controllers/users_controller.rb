@@ -7,6 +7,20 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
   end
 
+  def update_me
+    @user = current_user
+    if @user.update(params.require(:user).permit(:name))
+      render json: {
+        success: true,
+      }
+    else
+      render json: {
+        success: false,
+        message: @user.errors.values.join(","),
+      }
+    end
+  end
+
   def me
     @user = current_user
     render :show

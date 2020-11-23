@@ -1,10 +1,5 @@
 class CreateAnswers < ActiveRecord::Migration[6.0]
   def change
-    create_table :anonymous_users do |t|
-      t.string :name
-      t.timestamps
-    end
-
     create_table :answers do |t|
       t.references :userable, polymorphic: true
       t.references :game, null: false

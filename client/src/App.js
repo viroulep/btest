@@ -8,6 +8,7 @@ import Header from './components/Nav/Header';
 import Footer from './components/Nav/Footer';
 import GamesIndex from './components/Games/Index';
 import GameShow from './components/Games/Show';
+import EditProfile from './components/Profile/Edit';
 import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import { Grid, Container, CssBaseline } from '@material-ui/core';
@@ -28,7 +29,8 @@ function App() {
   // NOTE: we need to make *sure* to load the user before doing anything else!
   // Failure to do so may result to duplicate anonymous user.
   const {
-    data
+    data,
+    sync,
   } = useLoadedData(meUrl());
   // Some global message
   const [theme, toggle] = useReducer((state) => {
@@ -64,6 +66,9 @@ function App() {
                 </Route>
                 <Route path="/games/:gameId">
                   <GameShow me={data} />
+                </Route>
+                <Route path="/profile">
+                  <EditProfile me={data} sync={sync} />
                 </Route>
                 <Route path="/">
                   <Welcome user={data} toggle={toggle} />

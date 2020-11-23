@@ -8,6 +8,9 @@ variable :CLIENT_ORIGIN, :string
 # Used by the game jobs to perform requests on private endpoint
 variable :GAMES_SECRET, :string
 
+variable :GOOGLE_CLIENT_ID, :string
+variable :GOOGLE_CLIENT_SECRET, :string
+
 group :production do
   variable :SECRET_KEY_BASE
 end

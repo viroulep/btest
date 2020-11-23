@@ -23,6 +23,16 @@ class ApplicationController < ActionController::API
     @current_user ? @current_user : current_anonymous
   end
 
+  def clear_session
+    cookies.delete(:anonymous_user_id)
+    cookies.delete(:user_id)
+  end
+
+  def reset_session_user(user)
+    clear_session
+    cookies.encrypted[:user_id] = user.id
+  end
+
   def sign_in_or_anon!
     return if current_user
     anon_user = AnonymousUser.create_one!

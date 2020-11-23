@@ -39,16 +39,6 @@ ActiveRecord::Schema.define(version: 2020_11_17_161038) do
     t.index ["userable_type", "userable_id"], name: "index_answers_on_userable_type_and_userable_id"
   end
 
-  create_table "deezer_users", force: :cascade do |t|
-    t.string "name"
-    t.string "email"
-    t.string "avatar_url"
-    t.bigint "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_deezer_users_on_user_id"
-  end
-
   create_table "games", force: :cascade do |t|
     t.datetime "started_at"
     t.datetime "aborted_at"
@@ -56,15 +46,21 @@ ActiveRecord::Schema.define(version: 2020_11_17_161038) do
     t.integer "current_track", default: -1, null: false
     t.datetime "current_track_started_at"
     t.text "tracks"
-    t.string "slug"
+    t.string "slug", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["slug"], name: "index_games_on_slug", unique: true
   end
 
   create_table "users", force: :cascade do |t|
     t.string "name"
+    t.string "uid", null: false
+    t.string "provider", null: false
+    t.string "provided_name", null: false
+    t.string "provided_email", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
 end

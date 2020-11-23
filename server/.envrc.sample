@@ -1,4 +1,7 @@
 # These are some good default for development
 
-export CLIENT_ORIGIN="localhost:3000"
+export CLIENT_ORIGIN="http://localhost:3000"
 export GAMES_SECRET="secret"
+# For "sign in with google" to work, this needs to be set correctly
+export GOOGLE_CLIENT_ID="someid"
+export GOOGLE_CLIENT_SECRET="secret"

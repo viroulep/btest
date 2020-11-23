@@ -56,7 +56,7 @@ const AnswerForm = ({
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ q: query })
+      body: JSON.stringify({ q: query }),
     };
     fetchJsonOrError(gameAttemptUrl(slug), requestOptions)
       .then(setStatus);

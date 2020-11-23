@@ -17,7 +17,7 @@ const Snack = ({
       open={open}
       onClose={closeSnack}
     >
-      <Alert variant='filled' onClose={closeSnack} severity={severity}>
+      <Alert variant='filled' onClose={closeSnack} severity={severity || 'success'}>
         {message}
       </Alert>
     </Snackbar>

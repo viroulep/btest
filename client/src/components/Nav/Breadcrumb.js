@@ -8,6 +8,8 @@ const pathToName = (path) => {
     return 'Games';
   } else if (path.startsWith('/games/')) {
     return path.substring(7);
+  } else if (path === '/profile') {
+    return 'Profile';
   } else {
     return 'unknown';
   }
