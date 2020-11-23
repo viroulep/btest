@@ -9,20 +9,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { gamesUrl } from '../../requests/routes';
 import Snackbar from '../Snackbar/Snack';
 import { updateSnack } from '../../logic/snack';
-
-const statusForGame = game => {
-  if (game.finished) {
-    return "finished";
-  } else if (game.aborted) {
-    return "aborted";
-  } else if (game.running) {
-    return "running";
-  } else if (game.available) {
-    return "will start";
-  } else {
-    return "unknown";
-  }
-};
+import { statusForGame } from '../../logic/game';
 
 const GamesList = ({
   games,
@@ -30,11 +17,9 @@ const GamesList = ({
   <List>
     {games.map((v, k) => (
       <ListItem button component={RouterLink} key={k} to={`/games/${v.slug}`}>
-        Game #{v.slug} ({statusForGame(v)})
+        Game "{v.slug}" ({statusForGame(v)})
       </ListItem>
     ))}
-    <ListItem button>
-    </ListItem>
   </List>
 );
 

@@ -51,10 +51,25 @@ const handleDataReceived = (data, changeState, setPreview) => {
   }
 };
 
+const statusForGame = game => {
+  if (game.finished) {
+    return "finished";
+  } else if (game.aborted) {
+    return "aborted";
+  } else if (game.running) {
+    return "running";
+  } else if (game.available) {
+    return "pending";
+  } else {
+    return "unknown";
+  }
+};
+
 export {
   dispatcher,
   currentAnswer,
   startGame,
   stopGame,
   handleDataReceived,
+  statusForGame,
 };

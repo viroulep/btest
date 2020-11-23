@@ -7,7 +7,7 @@ class CreateGames < ActiveRecord::Migration[6.0]
       t.integer :current_track, default: -1, null: false
       t.datetime :current_track_started_at
       t.text :tracks
-      t.string :slug
+      t.string :slug, null: false, index: { unique: true }
 
       t.timestamps
     end

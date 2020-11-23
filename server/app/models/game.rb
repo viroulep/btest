@@ -4,10 +4,13 @@ class Game < ApplicationRecord
   SONG_DURATION = 30.seconds
   SONG_DELAY = 5.seconds
 
+  validates_uniqueness_of :slug
   serialize :tracks, Tracklist
   has_many :answers, dependent: :destroy
   after_save :post_game_cleanup, if: :saved_change_to_finished_at?
+  default_scope { order(created_at: :desc) }
 
+  scope :available, -> { where(aborted_at: nil, finished_at: nil) }
   def available?
     !(aborted? || finished?)
   end
@@ -16,6 +19,7 @@ class Game < ApplicationRecord
     !started_at.nil?
   end
 
+  scope :past, -> { where.not(aborted_at: nil).or(where.not(finished_at: nil)) }
   def finished?
     !finished_at.nil?
   end
@@ -109,14 +113,21 @@ class Game < ApplicationRecord
   def to_json
     {
       slug: slug,
-      current_track: current_track,
+      currentTrack: current_track,
       rankings: rankings,
       tracks: finished_tracks,
+      available: available?,
+      started: started?,
     }
   end
 
   def self.generate_slug
-    Random.new.rand(1_000_000).to_s.rjust(6, "0")
+    slug = ""
+    loop do
+      slug = Words::Generate.random(3)
+      break if Game.find_by_slug(slug).nil?
+    end
+    slug
   end
 
   def self.create_one!

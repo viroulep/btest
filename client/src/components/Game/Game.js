@@ -1,6 +1,7 @@
 import React, { useReducer, useCallback, useState, useEffect } from 'react';
 import Preview from './Preview';
-import { Grid } from '@material-ui/core';
+import { Box, Grid } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import PastTracks from './PastTracks';
 import Rankings from './Rankings';
 import consumer from '../../channels/consumer';
@@ -14,6 +15,14 @@ import {
 } from '../../logic/game';
 import { updateSnack } from '../../logic/snack';
 import Snackbar from '../Snackbar/Snack';
+import PositiveButton from '../Buttons/Positive';
+import NegativeButton from '../Buttons/Negative';
+
+const useStyles = makeStyles((theme) => ({
+  botSpace: {
+    marginBottom: theme.spacing(2),
+  },
+}));
 
 const Game = ({
   game,
@@ -29,7 +38,7 @@ const Game = ({
 
   const snackCallback = useCallback((data) => updateSnack(data, setSnack), [setSnack]);
 
-  const { slug, rankings, tracks, current_track } = state;
+  const { slug, rankings, tracks, currentTrack, started, available } = state;
 
   // The subscription
   useEffect(() => {
@@ -47,29 +56,39 @@ const Game = ({
       consumer.subscriptions.remove(sub);
     };
   }, [slug, changeState, setPreview]);
+
+  const { botSpace } = useStyles();
+
   return (
     <>
       <Snackbar snack={snack} setSnack={setSnack} />
-      <h2>
-        Selected game: {slug}
-        <button onClick={() => startGame(slug, snackCallback)}>
-          go
-        </button>
-        <button onClick={() => stopGame(slug, snackCallback)}>
-          stop
-        </button>
-      </h2>
       <Preview preview={preview} />
-      <Grid container spacing={3}>
-        <Grid container item xs={12}>
+      <Grid container>
+        {!started && available && (
+          <Grid item xs={12} className={botSpace}>
+            <PositiveButton fullWidth variant="contained" onClick={() => startGame(slug, snackCallback)}>
+              Start
+            </PositiveButton>
+          </Grid>
+        )}
+        {started && available && (
+          <Grid item xs={12} className={botSpace}>
+            <NegativeButton fullWidth variant="contained" onClick={() => stopGame(slug, snackCallback)}>
+              Abort game
+            </NegativeButton>
+          </Grid>
+        )}
+        <Grid container item xs={12} className={botSpace}>
           <GameState
-            currentTrack={current_track}
+            currentTrack={currentTrack}
             slug={slug}
             currentAnswer={currentAnswer(rankings, me)}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Rankings rankings={rankings} />
+        <Grid item xs={12} md={6} className={botSpace}>
+          <Box mr={{md: 2}}>
+            <Rankings rankings={rankings} />
+          </Box>
         </Grid>
         <Grid item xs={12} md={6}>
           <PastTracks slug={slug} tracks={tracks} />

@@ -5,7 +5,14 @@ class GamesController < ApplicationController
 
   # TODO: make this admin only?
   def index
-    @games = Game.all.order(created_at: :desc)
+    case params[:scope]
+    when "available"
+      @games = Game.available
+    when "past"
+      @games = Game.past
+    else
+      @games = Game.all
+    end
   end
 
   # TODO: user management
@@ -31,7 +38,8 @@ class GamesController < ApplicationController
     game.update!(started_at: Time.now)
     GameStepJob.set(wait: Game::START_DELAY).perform_later(game_next_url(game.slug))
     GameChannel.broadcast_to(game, {
-      action: "game_started",
+      event: 'game_started',
+      state: game.to_json,
     })
     return render json: { success: true, message: "Started" }
   end
@@ -51,6 +59,10 @@ class GamesController < ApplicationController
       return render json: { success: false, message: "Already finished or aborted" }
     end
     game.update!(aborted_at: Time.now)
+    GameChannel.broadcast_to(game, {
+      event: 'game_aborted',
+      state: game.to_json,
+    })
     render json: { success: true, message: "Aborted" }
   end
 
@@ -90,7 +102,8 @@ class GamesController < ApplicationController
       game.update!(finished_at: Time.now)
       # Broadcast the final state
       GameChannel.broadcast_to(game, {
-        action: "game_finished",
+        event: 'game_finished',
+        state: game.to_json,
       })
     end
     render json: { status: "running" }

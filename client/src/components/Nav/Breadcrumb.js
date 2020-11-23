@@ -1,26 +1,33 @@
 import React from 'react';
-import { Breadcrumbs, Typography } from '@material-ui/core';
+import { Breadcrumbs, Link, Typography } from '@material-ui/core';
 import { Link as RouterLink, Route } from 'react-router-dom';
-import { Link } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 const pathToName = (path) => {
   if (path === '/games') {
     return 'Games';
   } else if (path.startsWith('/games/')) {
-    return `Game#${path.substring(7)}`;
+    return path.substring(7);
   } else {
     return 'unknown';
   }
 };
 
+const useStyles = makeStyles((theme) => ({
+  botSpace: {
+    marginBottom: theme.spacing(2),
+  },
+}));
+
 const Breadcrumb = () => {
+  const { botSpace } = useStyles();
   return (
     <Route>
       {({ location }) => {
         const pathnames = location.pathname.split('/').filter((x) => x);
 
         return (
-          <Breadcrumbs aria-label="breadcrumb">
+          <Breadcrumbs aria-label="breadcrumb" className={botSpace}>
             <Link color="inherit" to="/" component={RouterLink}>
               Home
             </Link>

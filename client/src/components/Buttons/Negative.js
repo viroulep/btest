@@ -1,21 +1,21 @@
 import React  from 'react';
 import { createMuiTheme } from '@material-ui/core/styles';
-import { green } from '@material-ui/core/colors';
+import { red } from '@material-ui/core/colors';
 import ColouredButton from './Coloured';
 
-const greenTheme = createMuiTheme({
+const redTheme = createMuiTheme({
   palette: {
-    primary: green,
+    primary: red,
   },
 });
 
-const PositiveButton = ({
+const NegativeButton = ({
   children,
   ...props
 }) => (
-  <ColouredButton colouredTheme={greenTheme} {...props}>
+  <ColouredButton colouredTheme={redTheme} {...props}>
     {children}
   </ColouredButton>
 );
 
-export default PositiveButton;
+export default NegativeButton;
