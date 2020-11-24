@@ -37,8 +37,6 @@ const nameToRequestParams = (name) => ({
 
 const handler = (data, setSnack, setError, sync) => {
   const { success, message } = data;
-  console.log('received');
-  console.log(data);
   if (success) {
     setSnack({
       open: true,

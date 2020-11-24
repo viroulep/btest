@@ -39,4 +39,12 @@ class ApplicationController < ActionController::API
     cookies.encrypted[:anonymous_user_id] = anon_user.id
     current_anonymous
   end
+
+  def check_not_anon!
+    if current_user.anonymous?
+      render status: 403, json: {
+        message: "Can't access this page",
+      }
+    end
+  end
 end

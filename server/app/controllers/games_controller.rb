@@ -1,5 +1,7 @@
 class GamesController < ApplicationController
   skip_before_action :sign_in_or_anon!, only: [:next]
+  # TODO: proper user check
+  before_action :check_not_anon!, only: [:create, :start, :abor]
 
   TOKEN = ENVied.GAMES_SECRET.freeze
 

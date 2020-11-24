@@ -39,6 +39,7 @@ const Game = ({
   const snackCallback = useCallback((data) => updateSnack(data, setSnack), [setSnack]);
 
   const { slug, rankings, tracks, currentTrack, started, available } = state;
+  const { anonymous } = me;
 
   // The subscription
   useEffect(() => {
@@ -64,14 +65,14 @@ const Game = ({
       <Snackbar snack={snack} setSnack={setSnack} />
       <Preview preview={preview} />
       <Grid container>
-        {!started && available && (
+        {!anonymous && !started && available && (
           <Grid item xs={12} className={botSpace}>
             <PositiveButton fullWidth variant="contained" onClick={() => startGame(slug, snackCallback)}>
               Start
             </PositiveButton>
           </Grid>
         )}
-        {started && available && (
+        {!anonymous && started && available && (
           <Grid item xs={12} className={botSpace}>
             <NegativeButton fullWidth variant="contained" onClick={() => stopGame(slug, snackCallback)}>
               Abort game

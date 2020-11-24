@@ -43,21 +43,25 @@ const GamesIndex = ({
       });
   }, [setSnack, sync]);
 
+  // FIXME: proper auth support
+  const { anonymous } = me;
+  const headerAction = anonymous ? '' : (
+    <PositiveButton
+      variant="contained"
+      onClick={createGame}
+      startIcon={<AddIcon />}
+    >
+      Create
+    </PositiveButton>
+  )
+
   return (
     <>
       <Snackbar snack={snack} setSnack={setSnack} />
       <Card>
         <CardHeader
           title="Games"
-          action={
-            <PositiveButton
-              variant="contained"
-              onClick={createGame}
-              startIcon={<AddIcon />}
-            >
-              Create
-            </PositiveButton>
-          }
+          action={headerAction}
         />
         <CardContent>
           <WithLoading Component={GamesList} loadedData={loadedData} games={data} />
