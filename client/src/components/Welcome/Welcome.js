@@ -11,6 +11,7 @@ import {
   ListItemText,
   Typography,
 } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import { Link as RouterLink } from 'react-router-dom';
 import PersonIcon from '@material-ui/icons/Person';
 import { signInProviders } from '../../requests/routes';
@@ -35,7 +36,7 @@ const Welcome = ({
         <>
           <Box mb={2}>
             <Typography>
-              It looks like you're anonymous, you can login using a provider below.
+              It looks like you're anonymous, you can sign in using a provider below.
               <br/>
               In any case you can change your displayed name in your
               {' '}
@@ -43,6 +44,7 @@ const Welcome = ({
                 profile
               </Link>
             </Typography>
+            <Alert severity='info'>Currently signing in will only work with the developer's email</Alert>
           </Box>
           <List>
             {signInProviders.map((p) => (
