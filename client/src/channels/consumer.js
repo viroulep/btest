@@ -1,3 +1,4 @@
-import { createConsumer } from "@rails/actioncable"
+import { createConsumer } from '@rails/actioncable'
+import { cableUrl } from '../requests/routes';
 
-export default createConsumer("http://localhost:1235/cable")
+export default createConsumer(cableUrl())
