@@ -28,3 +28,4 @@ storage/*
 config/master.key
 
 .envrc.production
+.envrc.oauth

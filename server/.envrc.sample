@@ -5,3 +5,5 @@ export GAMES_SECRET="secret"
 # For "sign in with google" to work, this needs to be set correctly
 export GOOGLE_CLIENT_ID="someid"
 export GOOGLE_CLIENT_SECRET="secret"
+# This is not used in dev/test anyway!
+export BTEST_DATABASE_PASSWORD="somepassword"

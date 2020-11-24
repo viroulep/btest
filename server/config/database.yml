@@ -85,4 +85,4 @@ production:
   <<: *default
   database: btest_production
   username: btest
-  password: <%= ENV['BTEST_DATABASE_PASSWORD'] %>
+  password: <%= ENVied.BTEST_DATABASE_PASSWORD %>
