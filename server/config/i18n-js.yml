@@ -27,12 +27,11 @@
 export_i18n_js: false
 sort_translations_keys: true
 # FIXME: solve this in the client?
-# Setting this to :default_locale emit english values for all available
+# Setting this to :default_locale emits English values for all available
 # locales...
 # Doing a runtime fallback sounds better than duplicating all English values
 # for all locales!
 fallbacks: false
-# FIXME: somehow this should be generated from our config/locales
 translations:
   # NOTE: this emits to a symlink to the client source tree
 <% I18n.available_locales.each do |l| %>
@@ -43,7 +42,5 @@ translations:
       // DO NOT EDIT IT MANUALLY!
       import I18n from 'i18n-js';
 <% end %>
-# TODO:
-#   - output to some meaningful directory (eg: to the client)
-#   - scope what is extracted (by default, we get a lot of pluralization rules and
-#   activerecord stuff: don't include them until needed)
+# TODO: scope what is extracted (by default, we get a lot of pluralization
+# rules and activerecord stuff: don't include them until needed)

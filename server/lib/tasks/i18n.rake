@@ -13,7 +13,6 @@ export { localeImporters, availableLocales, defaultLocale };
 EOF
     # Emit additional js files for the client
     File.open(Rails.root.join('generated_locales', 'importers.js'), 'w+') do |f|
-      # fr: () => import('./locales/fr'),
       list = I18n.available_locales.map do |l|
         "  #{l}: () => import('./#{l}'),"
       end.join("\n")
