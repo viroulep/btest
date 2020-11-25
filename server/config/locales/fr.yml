@@ -1,0 +1,6 @@
+fr:
+  hello: "Salut monde"
+  test:
+    coucou: "une chaine %{test}"
+  nav:
+    home: "Accueil"

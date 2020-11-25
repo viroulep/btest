@@ -13,6 +13,8 @@ import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import { Grid, Container, CssBaseline } from '@material-ui/core';
 import { Switch, Route } from 'react-router-dom';
+import I18n from 'i18n-js';
+import { useLocale } from './logic/locales';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,10 +34,13 @@ function App() {
     data,
     sync,
   } = useLoadedData(meUrl());
-  // Some global message
+
   const [theme, toggle] = useReducer((state) => {
     return state === "light" ? "dark" : "light"
   }, "light");
+
+  const { locale, setLocale } = useLocale(data);
+  I18n.locale = locale;
 
   const muiTheme = createMuiTheme({
     palette: {
@@ -47,35 +52,39 @@ function App() {
 
   // TODO: extract the main entry point with all the theme + route wrapping
   // to some "withRoot" hook taking an entry point as parameter.
-
+  // TODO: create a loading component
   return (
     <ThemeProvider theme={muiTheme}>
       <CssBaseline />
       <div className={classes.root}>
       <Grid container direction="column" className={classes.grow}>
         <Grid item>
-          <Header user={data} />
+          <Header user={data} setLocale={setLocale} />
         </Grid>
         <Grid item>
           <Container>
-            <Breadcrumb />
-            {data ? (
-              <Switch>
-                <Route path="/games" exact>
-                  <GamesIndex me={data} />
-                </Route>
-                <Route path="/games/:gameId">
-                  <GameShow me={data} />
-                </Route>
-                <Route path="/profile">
-                  <EditProfile me={data} sync={sync} />
-                </Route>
-                <Route path="/">
-                  <Welcome user={data} toggle={toggle} />
-                </Route>
-              </Switch>
+            {data && locale ? (
+              <>
+                <Breadcrumb />
+                <Switch>
+                  <Route path="/games" exact>
+                    <GamesIndex me={data} />
+                  </Route>
+                  <Route path="/games/:gameId">
+                    <GameShow me={data} />
+                  </Route>
+                  <Route path="/profile">
+                    <EditProfile me={data} sync={sync} />
+                  </Route>
+                  <Route path="/">
+                    <Welcome user={data} toggle={toggle} />
+                  </Route>
+                </Switch>
+              </>
             ) : (
-              <p>Still loging you in</p>
+              <p>
+                Still loging you in (if nothing happens within seconds, something is most likely wrong).
+              </p>
             )}
           </Container>
         </Grid>

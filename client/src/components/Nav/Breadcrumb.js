@@ -2,6 +2,7 @@ import React from 'react';
 import { Breadcrumbs, Link, Typography } from '@material-ui/core';
 import { Link as RouterLink, Route } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
+import I18n from 'i18n-js';
 
 const pathToName = (path) => {
   if (path === '/games') {
@@ -31,7 +32,7 @@ const Breadcrumb = () => {
         return (
           <Breadcrumbs aria-label="breadcrumb" className={botSpace}>
             <Link color="inherit" to="/" component={RouterLink}>
-              Home
+              {I18n.t('nav.home')}
             </Link>
             {pathnames.map((value, index) => {
               const last = index === pathnames.length - 1;

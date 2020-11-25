@@ -1,0 +1,49 @@
+# Split context in several files.
+#
+# By default only one file with all translations is exported and
+# no configuration is required. Your settings for asset pipeline
+# are automatically recognized.
+#
+# If you want to split translations into several files or specify
+# locale contexts that will be exported, just use this file to do
+# so.
+#
+# For more informations about the export options with this file, please
+# refer to the README
+#
+#
+# If you're going to use the Rails 3.1 asset pipeline, change
+# the following configuration to something like this:
+#
+# translations:
+#   - file: "app/assets/javascripts/i18n/translations.js"
+#
+# If you're running an old version, you can use something
+# like this:
+#
+# translations:
+#   - file: "app/assets/javascripts/i18n/translations.js"
+#     only: "*"
+export_i18n_js: false
+sort_translations_keys: true
+# FIXME: solve this in the client?
+# Setting this to :default_locale emit english values for all available
+# locales...
+# Doing a runtime fallback sounds better than duplicating all English values
+# for all locales!
+fallbacks: false
+# FIXME: somehow this should be generated from our config/locales
+translations:
+  # NOTE: this emits to a symlink to the client source tree
+<% I18n.available_locales.each do |l| %>
+  - file: "generated_locales/<%= l %>.js"
+    only: "<%= l %>.*"
+    prefix: |
+      // This file is generated automatically by the i18n:export rake task!
+      // DO NOT EDIT IT MANUALLY!
+      import I18n from 'i18n-js';
+<% end %>
+# TODO:
+#   - output to some meaningful directory (eg: to the client)
+#   - scope what is extracted (by default, we get a lot of pluralization rules and
+#   activerecord stuff: don't include them until needed)
