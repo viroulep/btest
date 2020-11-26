@@ -84,6 +84,7 @@ const Game = ({
             currentTrack={currentTrack}
             slug={slug}
             currentAnswer={currentAnswer(rankings, me)}
+            preview={preview}
           />
         </Grid>
         <Grid item xs={12} md={6} className={botSpace}>

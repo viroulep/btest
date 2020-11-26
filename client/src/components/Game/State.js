@@ -1,9 +1,10 @@
-import React  from 'react';
+import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Typography } from '@material-ui/core';
 
 import AnswerForm from '../Answer/Form';
+import PreviewProgress from './PreviewProgress';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -19,6 +20,7 @@ const State = ({
   slug,
   currentTrack,
   currentAnswer,
+  preview,
 }) => {
   const { stateItem } = useStyles();
   return (
@@ -34,6 +36,9 @@ const State = ({
           currentTrack={currentTrack}
           currentAnswer={currentAnswer}
         />
+      </Grid>
+      <Grid item xs={12}>
+        <PreviewProgress preview={preview} />
       </Grid>
     </>
   );
