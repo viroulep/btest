@@ -7,6 +7,9 @@ import {
 } from '../locales/importers';
 import I18n from 'i18n-js';
 
+// Always import the English locale to be able to fallback!
+import '../locales/en';
+
 const getSessionLocaleForUser = (me) => {
   // TODO: get from me when implemented
   let requested = ls('locale');

@@ -41,6 +41,7 @@ function App() {
 
   const { locale, setLocale } = useLocale(data);
   I18n.locale = locale;
+  I18n.fallbacks = true;
 
   const muiTheme = createMuiTheme({
     palette: {
