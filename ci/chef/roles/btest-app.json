@@ -1,0 +1,13 @@
+{
+  "name": "btest-app",
+  "description": "Install/update the necessary user-specific dependencies",
+  "json_class": "Chef::Role",
+  "default_attributes": { },
+  "override_attributes": { },
+  "chef_type": "role",
+  "run_list": [
+    "recipe[btest::clone_repo]",
+    "recipe[btest::pg]",
+    "recipe[btest::install_server]"
+  ]
+}

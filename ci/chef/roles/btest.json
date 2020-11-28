@@ -1,0 +1,11 @@
+{
+  "name": "btest-essentials",
+  "description": "Creates the necessary linux environment to use btes",
+  "json_class": "Chef::Role",
+  "default_attributes": { },
+  "override_attributes": { },
+  "chef_type": "role",
+  "run_list": [
+    "recipe[btest]"
+  ]
+}

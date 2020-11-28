@@ -1,0 +1,13 @@
+{
+  "name": "btest-bootstrap",
+  "description": "Install the necessary system-wide packages / ruby / js dependencies",
+  "json_class": "Chef::Role",
+  "default_attributes": { },
+  "override_attributes": { },
+  "chef_type": "role",
+  "run_list": [
+    "recipe[btest::bootstrap]",
+    "recipe[btest::js]",
+    "recipe[btest::ruby]"
+  ]
+}

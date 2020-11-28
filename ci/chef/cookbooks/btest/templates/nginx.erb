@@ -2,13 +2,15 @@ upstream app {
   server unix:/tmp/puma.sock fail_timeout=0;
 }
 
+# FIXME: take the domain names from data_bags/environment?
 # the client server
 server {
   server_name quizz.virouleau.fr;
 
   listen 443;
 
-  include client_https.conf;
+  include certif_client.conf;
+  include use_https.conf;
 
 # Deny access to dotfiles and dotfolders.
   location ~ /\. {
@@ -35,7 +37,8 @@ server {
 
   listen 443;
 
-  include server_https.conf;
+  include certif_api.conf;
+  include use_https.conf;
 
 # Deny access to dotfiles and dotfolders.
   location ~ /\. {

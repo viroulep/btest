@@ -1,28 +1,23 @@
 #!/usr/bin/env bash
 
-pull_latest() {
-  git pull
-}
-
-rebuild_rails() {
-  bundle install
-  restart_app
-}
-
 restart_app() {
   if ps -efw | grep "puma" | grep -v grep; then
     # Found a puma process, restart it gracefully
     pid=$(<"/tmp/puma.pid")
     kill -SIGUSR2 $pid
   else
-    # We could not find a unicorn master process running, lets start one up!
+    # We could not find a puma master process running, lets start one up!
     bundle exec puma &
   fi
 }
+
+deploy_latest() {
+  git pull
+  sudo chef-solo -o 'role[btest-app]' -E production -c ../ci/chef/solo.rb
+  restart_app
+}
+
 cd "$(dirname "$0")"/..
 
-allowed_commands="pull_latest rebuild_rails restart_app"
+allowed_commands="restart_app deploy_latest"
 source scripts/_parse_args.sh
-
-# TODO
-#https://stackoverflow.com/questions/15306770/postgresql-fatal-peer-authentication-failed-for-user-pgconnectionbad
