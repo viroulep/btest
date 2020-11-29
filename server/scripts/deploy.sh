@@ -11,12 +11,12 @@ restart_app() {
     kill -SIGUSR2 $pid
   else
     # We could not find a puma master process running, lets start one up!
-    screen -A -m -d -S puma-prod bundle exec puma &
+    screen -A -m -d -S puma-prod bundle exec puma
   fi
 }
 
 deploy() {
-  sudo chef-solo -o 'role[btest-app]' -E production -c ../ci/chef/solo.rb
+  sudo chef-solo -o 'role[btest-app]' -E production -c ../ci/chef/solo.rb -l info
   set +x
   # Re-source env in case stuff changed
   source /home/btest/btest/env/envrc
