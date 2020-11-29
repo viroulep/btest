@@ -26,7 +26,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "yarn run build",
-    "deploy": "rsync -avh --delete build/ debian@quizz.virouleau.fr:/home/debian/btest/client/build"
+    "deploy": "rsync -avh --delete build/ btest@quizz.virouleau.fr:/home/btest/btest/client/build"
   },
   "eslintConfig": {
     "extends": [

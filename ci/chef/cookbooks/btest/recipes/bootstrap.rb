@@ -18,6 +18,7 @@ apt_package %w(git
                g++
                make
                postgresql
+               rsync
                )
 
 user "btest" do
