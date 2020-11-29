@@ -28,7 +28,7 @@ server {
     try_files $uri /index.html;
   }
 
-  root /home/debian/btest/client/build;
+  root /home/btest/btest/client/build;
 }
 
 # the real www https server!
@@ -50,7 +50,7 @@ server {
     allow all;
   }
 
-  root /home/debian/btest/server/public;
+  root /home/btest/btest/server/public;
 
 # http://vladigleba.com/blog/2014/03/27/deploying-rails-apps-part-4-configuring-nginx/
   location ~* /(assets|packs)/ {
