@@ -1,4 +1,3 @@
-current_dir=`dirname "$(readlink -f "$0")"`
 <% key = SecureRandom.hex(64) %>
 <% games_secret = SecureRandom.hex(64) %>
 <%# FIXME: to a helper %>
@@ -13,13 +12,14 @@ export GAMES_SECRET="<%= games_secret %>"
 export CLIENT_ORIGIN="<%= client %>"
 export BTEST_DATABASE_PASSWORD="notthepassword"
 
+env_dir="$HOME/btest/env"
 # Override with any other env setup there
-oauth_file="$current_dir/env.oauth"
+oauth_file="$env_dir/env.oauth"
 if [ -f "$oauth_file" ]; then
   source $oauth_file
 fi
 
-db_file="$current_dir/env.db"
+db_file="$env_dir/env.db"
 if [ -f "$db_file" ]; then
   source $db_file
 fi
