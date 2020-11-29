@@ -14,6 +14,8 @@ restart_app() {
 deploy_latest() {
   git pull
   sudo chef-solo -o 'role[btest-app]' -E production -c ../ci/chef/solo.rb
+  # Re-source env in case stuff changed
+  source /home/btest/btest/env/envrc
   restart_app
 }
 
