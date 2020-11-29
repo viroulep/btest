@@ -5,6 +5,8 @@
 <% client = rails_env == "production" ? "https://quizz.virouleau.fr" : "http://localhost:3000" %>
 
 export RAILS_ENV="<%= rails_env %>"
+# For puma...
+export RACK_ENV="<%= rails_env %>"
 export GOOGLE_CLIENT_ID="foo"
 export GOOGLE_CLIENT_SECRET="bar"
 export SECRET_KEY_BASE="<%= key %>"

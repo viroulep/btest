@@ -20,7 +20,7 @@ pidfile '/tmp/puma.pid'
 environment "production"
 
 
-stdout_redirect "/home/debian/btest/server/log/puma.out", "/home/debian/btest/server/log/puma.err", true
+stdout_redirect "/home/btest/btest/server/log/puma.out", "/home/btest/btest/server/log/puma.err", true
 
 # TODO: ssl
 # Specifies the number of `workers` to boot in clustered mode.

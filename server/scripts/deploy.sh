@@ -7,8 +7,6 @@ restart_app() {
     pid=$(<"/tmp/puma.pid")
     kill -SIGUSR2 $pid
   else
-    # FIXME: somehow the server doesn't stay alive when started from ssh,
-    # figure it out!
     # We could not find a puma master process running, lets start one up!
     bundle exec puma &
   fi
