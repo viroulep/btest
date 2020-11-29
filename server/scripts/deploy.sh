@@ -2,10 +2,12 @@
 
 restart_app() {
   if ps -efw | grep "puma" | grep -v grep; then
+    "Restarting puma"
     # Found a puma process, restart it gracefully
     pid=$(<"/tmp/puma.pid")
     kill -SIGUSR2 $pid
   else
+    "Starting puma"
     # We could not find a puma master process running, lets start one up!
     bundle exec puma &
   fi
