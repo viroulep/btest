@@ -18,7 +18,9 @@ apt_package %w(git
                g++
                make
                postgresql
+               screen
                rsync
+               man-db
                )
 
 user "btest" do
