@@ -25,11 +25,7 @@ const styles = (theme) => ({
   },
 });
 
-const Header = ({
-  classes,
-  user,
-  setLocale,
-}) => {
+const Header = ({ classes, user, setLocale }) => {
   const [open, setOpen] = useState(null);
   const handleAction = (action, ev) => {
     if (action === 'open') {
@@ -38,10 +34,13 @@ const Header = ({
       setOpen(null);
     }
   };
-  const handleSetLocale = useCallback((locale) => {
-    setLocale(locale);
-    setOpen(null);
-  }, [setOpen, setLocale]);
+  const handleSetLocale = useCallback(
+    (locale) => {
+      setLocale(locale);
+      setOpen(null);
+    },
+    [setOpen, setLocale]
+  );
 
   // FIXME: mobile menu
   return (
@@ -72,7 +71,7 @@ const Header = ({
           <IconButton
             edge="end"
             aria-label="locale of current user"
-            aria-haspopup='true'
+            aria-haspopup="true"
             color="inherit"
             onClick={(ev) => handleAction('open', ev)}
             className={classes.mr}
@@ -86,21 +85,14 @@ const Header = ({
             open={Boolean(open)}
             onClose={() => handleAction('close')}
           >
-            {availableLocales.map((l) =>
-              <MenuItem
-                key={l}
-                onClick={() => handleSetLocale(l)}
-              >
+            {availableLocales.map((l) => (
+              <MenuItem key={l} onClick={() => handleSetLocale(l)}>
                 {l}
               </MenuItem>
-            )}
+            ))}
           </Menu>
           {user && !user.anonymous && (
-            <Button
-              href={signoutUrl()}
-              color='secondary'
-              variant='contained'
-            >
+            <Button href={signoutUrl()} color="secondary" variant="contained">
               signout
             </Button>
           )}

@@ -13,11 +13,14 @@ const useLoadedData = (url) => {
   const sync = useCallback(() => {
     setLoading(true);
     setError(null);
-    fetchJsonOrError(url).then((loaded) => {
-      setData(loaded);
-    }).catch((err) => {
-      setError(err.message);
-    }).finally(() => setLoading(false));
+    fetchJsonOrError(url)
+      .then((loaded) => {
+        setData(loaded);
+      })
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => setLoading(false));
   }, [url, setData, setError]);
 
   useEffect(sync, [sync]);

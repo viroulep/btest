@@ -30,14 +30,11 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   // NOTE: we need to make *sure* to load the user before doing anything else!
   // Failure to do so may result to duplicate anonymous user.
-  const {
-    data,
-    sync,
-  } = useLoadedData(meUrl());
+  const { data, sync } = useLoadedData(meUrl());
 
   const [theme, toggle] = useReducer((state) => {
-    return state === "light" ? "dark" : "light"
-  }, "light");
+    return state === 'light' ? 'dark' : 'light';
+  }, 'light');
 
   const { locale, setLocale } = useLocale(data);
   I18n.locale = locale;
@@ -58,42 +55,43 @@ function App() {
     <ThemeProvider theme={muiTheme}>
       <CssBaseline />
       <div className={classes.root}>
-      <Grid container direction="column" className={classes.grow}>
-        <Grid item>
-          <Header user={data} setLocale={setLocale} />
+        <Grid container direction="column" className={classes.grow}>
+          <Grid item>
+            <Header user={data} setLocale={setLocale} />
+          </Grid>
+          <Grid item>
+            <Container>
+              {data && locale ? (
+                <>
+                  <Breadcrumb />
+                  <Switch>
+                    <Route path="/games" exact>
+                      <GamesIndex me={data} />
+                    </Route>
+                    <Route path="/games/:gameId">
+                      <GameShow me={data} />
+                    </Route>
+                    <Route path="/profile">
+                      <EditProfile me={data} sync={sync} />
+                    </Route>
+                    <Route path="/">
+                      <Welcome user={data} toggle={toggle} />
+                    </Route>
+                  </Switch>
+                </>
+              ) : (
+                <p>
+                  Still signing you in (if nothing happens within seconds,
+                  something is most likely wrong).
+                </p>
+              )}
+            </Container>
+          </Grid>
+          <Grid item className={classes.grow} />
+          <Grid item>
+            <Footer toggle={toggle} />
+          </Grid>
         </Grid>
-        <Grid item>
-          <Container>
-            {data && locale ? (
-              <>
-                <Breadcrumb />
-                <Switch>
-                  <Route path="/games" exact>
-                    <GamesIndex me={data} />
-                  </Route>
-                  <Route path="/games/:gameId">
-                    <GameShow me={data} />
-                  </Route>
-                  <Route path="/profile">
-                    <EditProfile me={data} sync={sync} />
-                  </Route>
-                  <Route path="/">
-                    <Welcome user={data} toggle={toggle} />
-                  </Route>
-                </Switch>
-              </>
-            ) : (
-              <p>
-                Still loging you in (if nothing happens within seconds, something is most likely wrong).
-              </p>
-            )}
-          </Container>
-        </Grid>
-        <Grid item className={classes.grow} />
-        <Grid item>
-          <Footer toggle={toggle} />
-        </Grid>
-      </Grid>
       </div>
     </ThemeProvider>
   );

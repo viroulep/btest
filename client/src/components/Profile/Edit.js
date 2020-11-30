@@ -49,59 +49,53 @@ const handler = (data, setSnack, setError, sync) => {
   // sync !
 };
 
-const EditProfile = ({
-  me,
-  sync,
-}) => {
+const EditProfile = ({ me, sync }) => {
   const { name, anonymous } = me;
   const nameRef = useRef(null);
-  const [newName, setNewName] = useState(anonymous ? splitAnonymousName(name) : name);
+  const [newName, setNewName] = useState(
+    anonymous ? splitAnonymousName(name) : name
+  );
   const [error, setError] = useState('');
   const [snack, setSnack] = useState({
     open: false,
   });
   const { flex, mb } = useStyles();
-  const updateName = useCallback((ev) => {
-    ev.preventDefault();
-    let nameParam = nameRef.current.value;
-    if (anonymous) {
-      nameParam = prefixAnonymousName(nameParam);
-    }
-    // TODO: catch
-    fetchJsonOrError(updateMeUrl(), nameToRequestParams(nameParam))
-      .then((data) => handler(data, setSnack, setError, sync));
-  }, [anonymous, nameRef, setSnack, setError, sync]);
-
+  const updateName = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      let nameParam = nameRef.current.value;
+      if (anonymous) {
+        nameParam = prefixAnonymousName(nameParam);
+      }
+      // TODO: catch
+      fetchJsonOrError(
+        updateMeUrl(),
+        nameToRequestParams(nameParam)
+      ).then((data) => handler(data, setSnack, setError, sync));
+    },
+    [anonymous, nameRef, setSnack, setError, sync]
+  );
 
   return (
     <Card>
       <CardHeader
-        title={
-          <Typography variant='h4'>
-            Edit your profile
-          </Typography>
-        }
+        title={<Typography variant="h4">Edit your profile</Typography>}
       />
       <CardContent>
         <Snackbar snack={snack} setSnack={setSnack} />
         <form noValidate autoComplete="off">
-          {!anonymous && (
-            <ProvidedData me={me} />
-          )}
+          {!anonymous && <ProvidedData me={me} />}
           <div className={flex}>
-            <Typography
-              variant='h6'
-              className={mb}
-            >
+            <Typography variant="h6" className={mb}>
               Local data
             </Typography>
             <TextField
-              variant='outlined'
+              variant="outlined"
               inputProps={{
-                ref: nameRef
+                ref: nameRef,
               }}
               error={error.length !== 0}
-              label='Your displayed name'
+              label="Your displayed name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               className={mb}
@@ -109,8 +103,8 @@ const EditProfile = ({
             />
             <PositiveButton
               onClick={updateName}
-              variant='contained'
-              type='submit'
+              variant="contained"
+              type="submit"
             >
               Save
             </PositiveButton>

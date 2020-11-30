@@ -12,11 +12,12 @@ const allSignInProviders = [
     id: 'developer',
     name: 'Developer',
     url: signInUrl('developer'),
-  }
+  },
 ];
 
-export const signInProviders = allSignInProviders.filter(p =>
-  (p.id !== 'developer' || process.env.NODE_ENV !== 'production'));
+export const signInProviders = allSignInProviders.filter(
+  (p) => p.id !== 'developer' || process.env.NODE_ENV !== 'production'
+);
 
 export const meUrl = () => `${BASE_URL}/me`;
 export const updateMeUrl = () => `${BASE_URL}/updateMe`;

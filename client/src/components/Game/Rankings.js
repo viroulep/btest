@@ -7,7 +7,7 @@ import {
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
-  Typography
+  Typography,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import FirstIcon from '../Icons/First';
@@ -31,27 +31,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const IconForRank = ({
-  rank,
-}) => {
+const IconForRank = ({ rank }) => {
   const { rankStyle } = useStyles();
   const Icon = rankToIcon[rank];
-  return (
-
-    Icon ? (
-      <Icon />
-    ) : (
-      <Typography className={rankStyle}>
-        {rank}
-      </Typography>
-    )
+  return Icon ? (
+    <Icon />
+  ) : (
+    <Typography className={rankStyle}>{rank}</Typography>
   );
 };
 
-const RankingItem = ({
-  rank,
-  value,
-}) => {
+const RankingItem = ({ rank, value }) => {
   // TODO: it would be nice to not display valid marks if the game
   // is over/aborted!
   const { name, points, current } = value;
@@ -67,25 +57,23 @@ const RankingItem = ({
           component: 'span',
         }}
       />
-      <ListItemSecondaryAction>
-        {points} points
-      </ListItemSecondaryAction>
+      <ListItemSecondaryAction>{points} points</ListItemSecondaryAction>
     </ListItem>
   );
 };
 
-const Rankings = ({
-  rankings,
-}) => {
+const Rankings = ({ rankings }) => {
   const { root } = useStyles();
   return (
     <>
       <Box mb={1}>
-        <Typography component="h3" variant="h4">Rankings</Typography>
+        <Typography component="h3" variant="h4">
+          Rankings
+        </Typography>
       </Box>
       <List className={root}>
         {rankings.map((v, k) => (
-          <RankingItem key={k} value={v} rank={k+1} />
+          <RankingItem key={k} value={v} rank={k + 1} />
         ))}
       </List>
     </>

@@ -9,7 +9,7 @@ import FormStatus from './FormStatus';
 
 const defaultStatus = {
   success: false,
-  message: "",
+  message: '',
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -29,50 +29,46 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-  }
+  },
 }));
 
-const AnswerForm = ({
-  slug,
-  currentTrack,
-  currentAnswer,
-}) => {
-  const [value, setValue] = useState("");
+const AnswerForm = ({ slug, currentTrack, currentAnswer }) => {
+  const [value, setValue] = useState('');
   const [status, setStatus] = useState(defaultStatus);
   const refTextField = useRef(null);
 
   // Reset on game/track change
   useEffect(() => {
-    setValue("");
+    setValue('');
     setStatus(defaultStatus);
   }, [slug, currentTrack]);
 
-  const submitAnswer = useCallback((ev) => {
-    ev.preventDefault();
-    const query = refTextField.current.value;
-    if (query.length <= 0) {
-      return;
-    }
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ q: query }),
-    };
-    fetchJsonOrError(gameAttemptUrl(slug), requestOptions)
-      .then(setStatus);
-    setValue("");
-    // Set the focus back to the text field
-    refTextField.current.focus();
-  }, [slug, setValue, setStatus]);
+  const submitAnswer = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      const query = refTextField.current.value;
+      if (query.length <= 0) {
+        return;
+      }
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ q: query }),
+      };
+      fetchJsonOrError(gameAttemptUrl(slug), requestOptions).then(setStatus);
+      setValue('');
+      // Set the focus back to the text field
+      refTextField.current.focus();
+    },
+    [slug, setValue, setStatus]
+  );
 
   const { grow, fullHeight, toUpper, gridInput, marksItem } = useStyles();
 
   return (
     <Box>
       <form onSubmit={submitAnswer}>
-        <Grid container direction="row" spacing={2}
-          className={gridInput}
-        >
+        <Grid container direction="row" spacing={2} className={gridInput}>
           <Grid item className={grow}>
             <TextField
               placeholder="Type in something"
@@ -84,27 +80,22 @@ const AnswerForm = ({
               }}
               fullWidth
               value={value}
-              onChange={e => setValue(e.target.value)}
+              onChange={(e) => setValue(e.target.value)}
             />
           </Grid>
           <Grid item>
             <Button
-              type='submit'
+              type="submit"
               className={fullHeight}
-              variant='contained'
-              color='primary'
-              aria-label='send-answer'
+              variant="contained"
+              color="primary"
+              aria-label="send-answer"
             >
               <SendRoundedIcon />
             </Button>
           </Grid>
         </Grid>
-        <Grid
-          container
-          direction='row'
-          spacing={2}
-          className={gridInput}
-        >
+        <Grid container direction="row" spacing={2} className={gridInput}>
           <Grid item className={marksItem}>
             <Marks data={currentAnswer} />
           </Grid>

@@ -16,23 +16,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function MediaControlCard({
-  track,
-  answer,
-}) {
+export default function MediaControlCard({ track, answer }) {
   const { root, details, cover } = useStyles();
-  const {
-    cover_url,
-    title,
-    artist
-  } = track;
+  const { cover_url, title, artist } = track;
   return (
     <Card className={root}>
-      <CardMedia
-        className={cover}
-        image={cover_url}
-        title="album cover"
-      />
+      <CardMedia className={cover} image={cover_url} title="album cover" />
       <CardContent className={details}>
         <Typography component="h5" variant="h5">
           {title}

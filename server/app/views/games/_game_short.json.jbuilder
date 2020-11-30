@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 json.extract! game, :id, :slug
 json.finished game.finished?
 json.aborted game.aborted?

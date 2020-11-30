@@ -1,0 +1,10 @@
+{
+  "extends": ["react-app"],
+  "plugins": ["prettier"],
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
+  "rules": {
+    "prettier/prettier": "warn"
+  }
+}

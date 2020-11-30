@@ -1,5 +1,7 @@
-require_relative 'boot'
-require_relative 'locales/locales'
+# frozen_string_literal: true
+
+require_relative "boot"
+require_relative "locales/locales"
 
 require "rails"
 # Pick the frameworks you want:
@@ -19,9 +21,9 @@ require "rails/test_unit/railtie"
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
-ENVied.require(*ENV['ENVIED_GROUPS'] || Rails.groups)
+ENVied.require(*ENV["ENVIED_GROUPS"] || Rails.groups)
 
-module Btest
+module Btest # rubocop:disable Style/ClassAndModuleChildren
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
@@ -41,8 +43,8 @@ module Btest
     config.middleware.use ActionDispatch::Session::CookieStore
 
     # Add 'lib' to the path
-    config.autoload_paths << Rails.root.join('lib')
-    config.eager_load_paths << Rails.root.join('lib')
+    config.autoload_paths << Rails.root.join("lib")
+    config.eager_load_paths << Rails.root.join("lib")
 
     # Remove activestorage routes which are still there somehow...
     initializer(:remove_as_routes, after: :add_routing_paths) do |app|

@@ -24,10 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Game = ({
-  game,
-  me,
-}) => {
+const Game = ({ game, me }) => {
   const [state, changeState] = useReducer(dispatcher, game);
   const [preview, setPreview] = useState(null);
   const [snack, setSnack] = useState({
@@ -36,24 +33,27 @@ const Game = ({
     message: '',
   });
 
-  const snackCallback = useCallback((data) => updateSnack(data, setSnack), [setSnack]);
+  const snackCallback = useCallback((data) => updateSnack(data, setSnack), [
+    setSnack,
+  ]);
 
   const { slug, rankings, tracks, currentTrack, started, available } = state;
   const { anonymous } = me;
 
   // The subscription
   useEffect(() => {
-    if (!slug)
-      return;
-    const sub = consumer.subscriptions.create({
-      channel: "GameChannel",
-      id: slug,
-    }, {
-      received: (data) => handleDataReceived(data, changeState, setPreview),
-    })
+    if (!slug) return;
+    const sub = consumer.subscriptions.create(
+      {
+        channel: 'GameChannel',
+        id: slug,
+      },
+      {
+        received: (data) => handleDataReceived(data, changeState, setPreview),
+      }
+    );
     return () => {
-      if (!slug)
-        return;
+      if (!slug) return;
       consumer.subscriptions.remove(sub);
     };
   }, [slug, changeState, setPreview]);
@@ -67,14 +67,22 @@ const Game = ({
       <Grid container>
         {!anonymous && !started && available && (
           <Grid item xs={12} className={botSpace}>
-            <PositiveButton fullWidth variant="contained" onClick={() => startGame(slug, snackCallback)}>
+            <PositiveButton
+              fullWidth
+              variant="contained"
+              onClick={() => startGame(slug, snackCallback)}
+            >
               Start
             </PositiveButton>
           </Grid>
         )}
         {!anonymous && started && available && (
           <Grid item xs={12} className={botSpace}>
-            <NegativeButton fullWidth variant="contained" onClick={() => stopGame(slug, snackCallback)}>
+            <NegativeButton
+              fullWidth
+              variant="contained"
+              onClick={() => stopGame(slug, snackCallback)}
+            >
               Abort game
             </NegativeButton>
           </Grid>
@@ -88,7 +96,7 @@ const Game = ({
           />
         </Grid>
         <Grid item xs={12} md={6} className={botSpace}>
-          <Box mr={{md: 2}}>
+          <Box mr={{ md: 2 }}>
             <Rankings rankings={rankings} />
           </Box>
         </Grid>

@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   has_many :answers, as: :userable, dependent: :destroy
 
   # FIXME: create some concern to factorize this
   # This restriction is here mainly to have a nicely displayed name
   # Only validate on update, in case the provider gives us something above that.
-  validates_length_of :name, minimum: 1, maximum: 50, on: :update
+  validates :name, length: { minimum: 1, maximum: 50, on: :update }
 
   def identifiable_attrs
     {

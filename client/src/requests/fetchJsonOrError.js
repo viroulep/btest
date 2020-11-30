@@ -5,12 +5,14 @@ export function fetchJsonOrError(url, fetchOptions = {}) {
     mode: 'cors',
     credentials: 'include',
   };
-  return fetch(url, fetchOptions)
-    .then((response) => response.json()
-      .then((json) => {
-        if (!response.ok) {
-          throw new Error(`${response.status}: ${response.statusText}\n${json.error}`);
-        }
-        return json;
-      }));
+  return fetch(url, fetchOptions).then((response) =>
+    response.json().then((json) => {
+      if (!response.ok) {
+        throw new Error(
+          `${response.status}: ${response.statusText}\n${json.error}`
+        );
+      }
+      return json;
+    })
+  );
 }

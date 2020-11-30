@@ -1,0 +1,4 @@
+src/locales
+build/
+coverage/
+public/

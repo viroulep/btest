@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class Game < ApplicationRecord
-  SONG_SOURCE="https://api.deezer.com/radio/38325/tracks"
+  SONG_SOURCE = "https://api.deezer.com/radio/38325/tracks"
   START_DELAY = 5.seconds
   SONG_DURATION = 30.seconds
   SONG_DELAY = 5.seconds
 
-  validates_uniqueness_of :slug
+  validates :slug, uniqueness: true
   serialize :tracks, Tracklist
   has_many :answers, dependent: :destroy
   after_save :post_game_cleanup, if: :saved_change_to_finished_at?
@@ -40,12 +42,12 @@ class Game < ApplicationRecord
     end
   end
 
-  def has_active_track?
+  def active_track?
     running? && current_track >= 0
   end
 
   def find_or_create_answer_for!(user)
-    return nil unless has_active_track?
+    return nil unless active_track?
 
     existing = user.answers.find_by(game: self, track_index: current_track)
     return existing if existing
@@ -63,13 +65,14 @@ class Game < ApplicationRecord
 
   def add_active_user(user)
     return unless available?
+
     answers.create!({
-      artist_parts: [],
-      title_parts: [],
-      track_index: -1,
-      track_started_at: Time.now,
-      userable: user,
-    })
+                      artist_parts: [],
+                      title_parts: [],
+                      track_index: -1,
+                      track_started_at: Time.now.iso8601,
+                      userable: user,
+                    })
   end
 
   def remove_active_user(user)
@@ -78,14 +81,14 @@ class Game < ApplicationRecord
 
   def answers_for(user)
     answers.where(userable: user)
-      .where.not(track_index: -1)
-      .order(track_index: :desc)
+           .where.not(track_index: -1)
+           .order(track_index: :desc)
   end
 
-  def rankings
-    answers.includes(:userable)
-      .group_by(&:userable)
-      .map do |user, valid|
+  def rankings # rubocop:disable Metrics/AbcSize
+    raw_rankings = answers.includes(:userable)
+                          .group_by(&:userable)
+                          .map do |user, valid|
       current_answer = valid.find { |a| a.track_index == current_track }&.to_json if current_track >= 0
       {
         name: user.name,
@@ -94,23 +97,61 @@ class Game < ApplicationRecord
         points: valid.sum(&:total_points),
         current: current_answer,
       }
-    end.sort_by! { |a| -a[:points] }
+    end
+    raw_rankings.sort_by! { |a| -a[:points] }
   end
 
   def rank_correct_answers(track_index)
     # Technically it only makes sense to do so for past or current track,
     # but there is no harm in running this for arbitrary track_index.
     correct_answers = answers
-      .where(track_index: track_index)
-      .where.not(validated_at: nil)
-      .order(validated_at: :asc)
-      .limit(3)
+                      .where(track_index: track_index)
+                      .where.not(validated_at: nil)
+                      .order(validated_at: :asc)
+                      .limit(3)
     correct_answers.each.with_index(1) do |a, pos|
       a.update(worthy_position: pos)
     end
   end
 
-  def to_json
+  def next_song!
+    next_track = current_track + 1
+    raise "Invalid call to next_song!" unless next_track < tracks.size
+
+    update!(current_track: next_track, current_track_started_at: Time.current)
+
+    # FIXME: we should probably give an estimate during the round, but that
+    # computing should prevail in case some request was somehow delayed.
+    # Rank correct answers (note that this is fine to do this for
+    # current_track=-1)
+    rank_correct_answers(current_track)
+
+    # Broadcast current song and state
+    GameChannel.broadcast_to(self, {
+                               state: to_json,
+                               preview: tracks[next_track].sample_url,
+                             })
+  end
+
+  def finish!
+    # Finish the game
+    update!(finished_at: Time.current)
+    # Broadcast the final state
+    GameChannel.broadcast_to(self, {
+                               event: "game_finished",
+                               state: to_json,
+                             })
+  end
+
+  def abort!
+    update!(aborted_at: Time.current)
+    GameChannel.broadcast_to(self, {
+                               event: "game_aborted",
+                               state: to_json,
+                             })
+  end
+
+  def to_json(*_args)
     {
       slug: slug,
       currentTrack: current_track,
@@ -125,7 +166,7 @@ class Game < ApplicationRecord
     slug = ""
     loop do
       slug = Words::Generate.random(3)
-      break if Game.find_by_slug(slug).nil?
+      break if Game.find_by(slug: slug).nil?
     end
     slug
   end
@@ -133,23 +174,24 @@ class Game < ApplicationRecord
   def self.create_one!
     # FIXME: proper "music source" class with providers
     # for testing purpose, this is the "2000" mix
-    begin
-      # Request 50, because the 15 first tend to be very similar
-      mix = RestClient.get("https://api.deezer.com/radio/38325/tracks?limit=50")
-      data = JSON.parse(mix.body)
-      data["data"] = data["data"].shuffle.first(15)
-      # FIXME: create a tracklist object
-      tracks = Tracklist.from_deezer(data)
-      puts "there are #{tracks.size} songs"
-      # FIXME: make sure slug is unique!
-      [Game.create!(slug: Game.generate_slug, tracks: tracks), nil]
-    rescue RestClient::ExceptionWithResponse => err
-      [nil, err]
-    end
+
+    # Request 50, because the 15 first tend to be very similar
+    mix = RestClient.get("https://api.deezer.com/radio/38325/tracks?limit=50")
+    data = JSON.parse(mix.body)
+    data["data"] = data["data"].sample(15)
+    # FIXME: create a tracklist object
+    tracks = Tracklist.from_deezer(data)
+    # FIXME: make sure slug is unique!
+    [Game.create!(slug: Game.generate_slug, tracks: tracks), nil]
+  rescue RestClient::ExceptionWithResponse => e
+    [nil, e]
   end
 
-  private def post_game_cleanup
+  private
+
+  def post_game_cleanup
     return unless finished_at
+
     # Remove any active user
     answers.where(track_index: -1).destroy_all
   end

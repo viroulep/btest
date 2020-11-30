@@ -16,19 +16,15 @@ import { Link as RouterLink } from 'react-router-dom';
 import PersonIcon from '@material-ui/icons/Person';
 import { signInProviders } from '../../requests/routes';
 
-const Welcome = ({
-  user,
-  toggle,
-}) => (
+const Welcome = ({ user, toggle }) => (
   <Card>
     <CardContent>
       <h1>Welcome {user.name} !</h1>
       <Typography paragraph>
         Some smart text about the website.
-        <br/>
-        Checkout the
-        {' '}
-        <Link to="/games" component={RouterLink} >
+        <br />
+        Checkout the{' '}
+        <Link to="/games" component={RouterLink}>
           games
         </Link>
       </Typography>
@@ -36,28 +32,28 @@ const Welcome = ({
         <>
           <Box mb={2}>
             <Typography>
-              It looks like you're anonymous, you can sign in using a provider below.
-              <br/>
-              In any case you can change your displayed name in your
-              {' '}
-              <Link to="/profile" component={RouterLink} >
+              It looks like you're anonymous, you can sign in using a provider
+              below.
+              <br />
+              In any case you can change your displayed name in your{' '}
+              <Link to="/profile" component={RouterLink}>
                 profile
               </Link>
             </Typography>
-            <Alert severity='info'>Currently signing in will only work with the developer's email</Alert>
+            <Alert severity="info">
+              Currently signing in will only work with the developer's email
+            </Alert>
           </Box>
           <List>
             {signInProviders.map((p) => (
-              <form action={p.url} method='POST' key={p.id}>
-                <ListItem button type='submit' component='button'>
+              <form action={p.url} method="POST" key={p.id}>
+                <ListItem button type="submit" component="button">
                   <ListItemAvatar>
                     <Avatar>
                       <PersonIcon />
                     </Avatar>
                   </ListItemAvatar>
-                  <ListItemText
-                    primary={`Sign in with ${p.name}`}
-                  />
+                  <ListItemText primary={`Sign in with ${p.name}`} />
                 </ListItem>
               </form>
             ))}
@@ -65,9 +61,8 @@ const Welcome = ({
         </>
       ) : (
         <Typography>
-          If you want you can change your displayed name in your
-          {' '}
-          <Link to="/profile" component={RouterLink} >
+          If you want you can change your displayed name in your{' '}
+          <Link to="/profile" component={RouterLink}>
             profile
           </Link>
         </Typography>

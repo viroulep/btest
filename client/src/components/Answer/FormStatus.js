@@ -9,16 +9,14 @@ const useStyles = makeStyles((theme) => ({
     minHeight: '40px',
   },
   bgOk: {
-    backgroundColor: "green",
+    backgroundColor: 'green',
   },
   bgKo: {
-    backgroundColor: "red",
-  }
+    backgroundColor: 'red',
+  },
 }));
 
-const FormStatus = ({
-  status,
-}) => {
+const FormStatus = ({ status }) => {
   const { message, success } = status;
   const hasMessage = message.length > 0;
   const valid = hasMessage && success;
@@ -26,12 +24,10 @@ const FormStatus = ({
   const { paper, bgOk, bgKo } = useStyles();
   return (
     <Paper
-      variant='outlined'
+      variant="outlined"
       className={clsx(paper, valid && bgOk, invalid && bgKo)}
     >
-      {hasMessage && (
-        <>{message}</>
-      )}
+      {hasMessage && <>{message}</>}
     </Paper>
   );
 };

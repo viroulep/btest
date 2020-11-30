@@ -1,11 +1,9 @@
-class Track
-  attr_accessor :title
-  attr_accessor :artist
-  attr_accessor :cover_url
-  attr_accessor :sample_url
+# frozen_string_literal: true
 
-  attr_reader :artist_parts
-  attr_reader :title_parts
+class Track
+  attr_accessor :title, :artist, :cover_url, :sample_url
+
+  attr_reader :artist_parts, :title_parts
 
   def initialize(title, artist, cover_url, sample_url)
     @title = title
@@ -33,7 +31,7 @@ class Track
               json["sample_url"])
   end
 
-  def to_json
+  def to_json(*_args)
     {
       "title" => title,
       "artist" => artist,

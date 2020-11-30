@@ -1,4 +1,4 @@
-import React  from 'react';
+import React from 'react';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
 
@@ -11,11 +11,7 @@ const withColouredTheme = (theme, colouredTheme) => ({
   },
 });
 
-const ColouredButton = ({
-  children,
-  colouredTheme,
-  ...props
-}) => {
+const ColouredButton = ({ children, colouredTheme, ...props }) => {
   return (
     <ThemeProvider theme={(theme) => withColouredTheme(theme, colouredTheme)}>
       <Button {...props} color="primary">

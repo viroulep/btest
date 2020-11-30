@@ -1,20 +1,18 @@
-module ApplicationCable
-  class Connection < ActionCable::Connection::Base
-    identified_by :current_user
+# frozen_string_literal: true
 
-    def connect
-      self.current_user = find_user_session
-    end
+class ApplicationCable::Connection < ActionCable::Connection::Base
+  identified_by :current_user
 
-    private def find_user_session
-      user = User.find_by(id: cookies.encrypted[:user_id])
-      unless user
-        user = AnonymousUser.find_by(id: cookies.encrypted[:anonymous_user_id])
-      end
-      unless user
-        reject_unauthorized_connection
-      end
-      user
-    end
+  def connect
+    self.current_user = find_user_session
+  end
+
+  private
+
+  def find_user_session
+    user = User.find_by(id: cookies.encrypted[:user_id])
+    user ||= AnonymousUser.find_by(id: cookies.encrypted[:anonymous_user_id])
+    reject_unauthorized_connection unless user
+    user
   end
 end

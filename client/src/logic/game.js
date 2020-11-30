@@ -8,7 +8,7 @@ const dispatcher = (state, action) => {
       return {
         ...state,
         rankings: data,
-      }
+      };
     case 'state':
       return data;
     default:
@@ -17,9 +17,9 @@ const dispatcher = (state, action) => {
 };
 
 const currentAnswer = (rankings, me) => {
-  const myRank = rankings.find(el => (
-    el.id === me.id && el.anonymous === me.anonymous
-  ));
+  const myRank = rankings.find(
+    (el) => el.id === me.id && el.anonymous === me.anonymous
+  );
   return myRank ? myRank.current : null;
 };
 
@@ -51,17 +51,17 @@ const handleDataReceived = (data, changeState, setPreview) => {
   }
 };
 
-const statusForGame = game => {
+const statusForGame = (game) => {
   if (game.finished) {
-    return "finished";
+    return 'finished';
   } else if (game.aborted) {
-    return "aborted";
+    return 'aborted';
   } else if (game.running) {
-    return "running";
+    return 'running';
   } else if (game.available) {
-    return "pending";
+    return 'pending';
   } else {
-    return "unknown";
+    return 'unknown';
   }
 };
 

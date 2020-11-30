@@ -16,20 +16,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Footer = ({
-  toggle,
-}) => {
+const Footer = ({ toggle }) => {
   const theme = useTheme();
   const classes = useStyles();
   return (
     <Box p={1}>
       <Grid container spacing={1}>
         <Grid item>
-          <IconButton
-            size="small"
-            onClick={toggle}
-            aria-label="Toggle theme"
-          >
+          <IconButton size="small" onClick={toggle} aria-label="Toggle theme">
             {theme.palette.type === 'dark' ? (
               <EmojiObjectsIcon />
             ) : (
@@ -39,11 +33,7 @@ const Footer = ({
         </Grid>
         <Grid item className={classes.grow} />
         <Grid item>
-          <Link
-            className={classes.link}
-            variant="subtitle1"
-            to="/about"
-          >
+          <Link className={classes.link} variant="subtitle1" to="/about">
             About
           </Link>
         </Grid>

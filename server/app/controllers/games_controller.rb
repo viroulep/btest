@@ -1,20 +1,24 @@
+# frozen_string_literal: true
+
 class GamesController < ApplicationController
   skip_before_action :sign_in_or_anon!, only: [:next]
   # TODO: proper user check
-  before_action :check_not_anon!, only: [:create, :start, :abor]
+  before_action :check_not_anon!, only: [:create, :start, :abort]
+  before_action :validate_token!, only: [:next]
+  before_action :set_game!, except: [:create, :index]
 
   TOKEN = ENVied.GAMES_SECRET.freeze
 
   # TODO: make this admin only?
   def index
-    case params[:scope]
-    when "available"
-      @games = Game.available
-    when "past"
-      @games = Game.past
-    else
-      @games = Game.all
-    end
+    @games = case params[:scope]
+             when "available"
+               Game.available
+             when "past"
+               Game.past
+             else
+               Game.all
+             end
   end
 
   # TODO: user management
@@ -22,100 +26,64 @@ class GamesController < ApplicationController
     game, err = Game.create_one!
     render json: {
       success: err.nil?,
-      message: err ? err : "Created game #{game.slug}",
+      message: err || "Created game #{game.slug}",
     }
   end
 
   def show
-    game = Game.find_by_slug!(params[:id])
-    render json: game.to_json
+    render json: @game.to_json
   end
 
   def start
-    game = Game.find_by_slug!(params[:game_id])
-    if game.started?
-      return render json: { success: false, message: "Already started" }
-    end
+    return render json: { success: false, message: "Already started" } if @game.started?
+
     # Start game and return
-    game.update!(started_at: Time.now)
-    GameStepJob.set(wait: Game::START_DELAY).perform_later(game_next_url(game.slug))
-    GameChannel.broadcast_to(game, {
-      event: 'game_started',
-      state: game.to_json,
-    })
-    return render json: { success: true, message: "Started" }
+    @game.update!(started_at: Time.current)
+    GameStepJob.set(wait: Game::START_DELAY).perform_later(game_next_url(@game.slug))
+    GameChannel.broadcast_to(@game, {
+                               event: "game_started",
+                               state: @game.to_json,
+                             })
+    render json: { success: true, message: "Started" }
   end
 
   def mine
-    game = Game.find_by_slug!(params[:game_id])
-    answers_by_index = game.answers_for(current_user)
-      .group_by(&:track_index).map do |i, a|
-      [i, a.first.to_json]
-    end.to_h
+    answers_by_index = @game.answers_for(current_user)
+                            .group_by(&:track_index).transform_values do |a|
+      a.first.to_json
+    end
     render json: answers_by_index
   end
 
   def abort
-    game = Game.find_by_slug!(params[:game_id])
-    unless game.available?
-      return render json: { success: false, message: "Already finished or aborted" }
-    end
-    game.update!(aborted_at: Time.now)
-    GameChannel.broadcast_to(game, {
-      event: 'game_aborted',
-      state: game.to_json,
-    })
+    return render json: { success: false, message: "Already finished or aborted" } unless @game.available?
+
+    @game.abort!
     render json: { success: true, message: "Aborted" }
   end
 
   def next
     # TODO: maybe do nothing if a job is already in the queue!
-    game = Game.find_by_slug!(params.require([:game_id]))
-    token = params.require(:token)
-    unless token == TOKEN
-      raise ActiveRecord::RecordNotFound
-    end
 
     # If the game does not run anymore, just return
-    return render json: { status: "finished" } unless game.running?
+    return render json: { status: "finished" } unless @game.running?
 
-    current_track = game.current_track
-    next_track = current_track + 1
-    if next_track < game.tracks.size
-      # To next song!
-      game.update!(current_track: next_track, current_track_started_at: Time.now)
+    if @game.current_track + 1 < @game.tracks.size
+      @game.next_song!
 
-      # FIXME: we should probably give an estimate during the round, but that
-      # computing should prevail in case some request was somehow delayed.
-      # Rank correct answers (note that this is fine to do this for
-      # current_track=-1)
-      game.rank_correct_answers(current_track)
-
-      # Broadcast current song and state
-      GameChannel.broadcast_to(game, {
-        state: game.to_json,
-        preview: game.tracks[next_track].sample_url,
-      })
-
-      # Set next step
-      GameStepJob.set(wait: Game::SONG_DURATION + Game::SONG_DELAY).perform_later(game_next_url(game.slug))
+      # Enqueue next step
+      GameStepJob.set(wait: Game::SONG_DURATION + Game::SONG_DELAY).perform_later(game_next_url(@game.slug))
     else
-      # Finish the game
-      game.update!(finished_at: Time.now)
-      # Broadcast the final state
-      GameChannel.broadcast_to(game, {
-        event: 'game_finished',
-        state: game.to_json,
-      })
+      @game.finish!
     end
+
     render json: { status: "running" }
   end
 
   def attempt
-    attempt_timestamp = Time.now
-    game = Game.find_by_slug!(params[:game_id])
+    attempt_timestamp = Time.current
     query = params.require(:q)
-    answer = game.find_or_create_answer_for!(current_user)
+    answer = @game.find_or_create_answer_for!(current_user)
     unless answer
       return render json: {
         success: false,
@@ -127,14 +95,25 @@ class GamesController < ApplicationController
 
     if res
       # Broadcast new rankings
-      GameChannel.broadcast_to(game, {
-        rankings: game.rankings,
-      })
+      GameChannel.broadcast_to(@game, {
+                                 rankings: @game.rankings,
+                               })
     end
 
     render json: {
       success: res,
       message: msg,
     }
+  end
+
+  private
+
+  def validate_token!
+    token = params.require(:token)
+    raise ActiveRecord::RecordNotFound unless token == TOKEN
+  end
+
+  def set_game!
+    @game = Game.find_by!(slug: params[:game_id] || params[:id])
   end
 end

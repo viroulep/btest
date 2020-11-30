@@ -1,7 +1,13 @@
-import React, { useState, useCallback }  from 'react';
+import React, { useState, useCallback } from 'react';
 import WithLoading from '../WithLoading/WithLoading';
 import useLoadedData from '../../requests/loadable';
-import { Card, CardHeader, CardContent, List, ListItem } from '@material-ui/core';
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  List,
+  ListItem,
+} from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import PositiveButton from '../Buttons/Positive';
 import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
@@ -11,9 +17,7 @@ import Snackbar from '../Snackbar/Snack';
 import { updateSnack } from '../../logic/snack';
 import { statusForGame } from '../../logic/game';
 
-const GamesList = ({
-  games,
-}) => (
+const GamesList = ({ games }) => (
   <List>
     {games.map((v, k) => (
       <ListItem button component={RouterLink} key={k} to={`/games/${v.slug}`}>
@@ -23,10 +27,7 @@ const GamesList = ({
   </List>
 );
 
-
-const GamesIndex = ({
-  me,
-}) => {
+const GamesIndex = ({ me }) => {
   const loadedData = useLoadedData(gamesUrl());
   const { data, sync } = loadedData;
   const [snack, setSnack] = useState({
@@ -36,16 +37,17 @@ const GamesIndex = ({
   });
 
   const createGame = useCallback(() => {
-    fetchJsonOrError(gamesUrl(), { method: 'POST' })
-      .then((data) => {
-        updateSnack(data, setSnack);
-        sync();
-      });
+    fetchJsonOrError(gamesUrl(), { method: 'POST' }).then((data) => {
+      updateSnack(data, setSnack);
+      sync();
+    });
   }, [setSnack, sync]);
 
   // FIXME: proper auth support
   const { anonymous } = me;
-  const headerAction = anonymous ? '' : (
+  const headerAction = anonymous ? (
+    ''
+  ) : (
     <PositiveButton
       variant="contained"
       onClick={createGame}
@@ -53,18 +55,19 @@ const GamesIndex = ({
     >
       Create
     </PositiveButton>
-  )
+  );
 
   return (
     <>
       <Snackbar snack={snack} setSnack={setSnack} />
       <Card>
-        <CardHeader
-          title="Games"
-          action={headerAction}
-        />
+        <CardHeader title="Games" action={headerAction} />
         <CardContent>
-          <WithLoading Component={GamesList} loadedData={loadedData} games={data} />
+          <WithLoading
+            Component={GamesList}
+            loadedData={loadedData}
+            games={data}
+          />
         </CardContent>
       </Card>
     </>

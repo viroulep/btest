@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 import { Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import MicIcon from '@material-ui/icons/Mic';
@@ -35,15 +34,8 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Marks = ({
-  data,
-}) => {
-  const { 
-    artist,
-    title,
-    fast,
-    worthy_position,
-  } = data ? data : defaultAnswer;
+const Marks = ({ data }) => {
+  const { artist, title, fast, worthy_position } = data ? data : defaultAnswer;
   const { root } = useStyles();
   const PosIcon = posToIcon(worthy_position);
   return (
@@ -55,7 +47,7 @@ const Marks = ({
         <PosIcon fontSize="small" />
       </Box>
     </div>
-  )
+  );
 };
 
 export default Marks;

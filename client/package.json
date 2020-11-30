@@ -23,16 +23,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "CI=true react-scripts test",
+    "test:lint": "yarn run eslint src",
     "eject": "react-scripts eject",
     "predeploy": "yarn run build",
     "deploy": "rsync -avh --delete build/ btest@quizz.virouleau.fr:/home/btest/btest/client/build"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -45,5 +40,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "2.2.1"
   }
 }

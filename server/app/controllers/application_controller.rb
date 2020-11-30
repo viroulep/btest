@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::API
   include ActionController::Cookies
   before_action :sign_in_or_anon!
 
   helper_method :current_user
 
-  rescue_from ActiveRecord::RecordNotFound, with: -> {
-    render status: 404, json: {
-      message: "Object not found"
+  rescue_from ActiveRecord::RecordNotFound, with: lambda {
+    render status: :not_found, json: {
+      message: "Object not found",
     }
   }
 
@@ -15,12 +17,8 @@ class ApplicationController < ActionController::API
   end
 
   def current_user
-    begin
-      @current_user ||= User.find_by(id: cookies.encrypted[:user_id])
-    rescue Exception => e
-      nil
-    end
-    @current_user ? @current_user : current_anonymous
+    @current_user ||= User.find_by(id: cookies.encrypted[:user_id])
+    @current_user || current_anonymous
   end
 
   def clear_session
@@ -35,16 +33,17 @@ class ApplicationController < ActionController::API
 
   def sign_in_or_anon!
     return if current_user
+
     anon_user = AnonymousUser.create_one!
     cookies.encrypted[:anonymous_user_id] = anon_user.id
     current_anonymous
   end
 
   def check_not_anon!
-    if current_user.anonymous?
-      render status: 403, json: {
-        message: "Can't access this page",
-      }
-    end
+    return unless current_user.anonymous?
+
+    render status: :forbidden, json: {
+      message: "Can't access this page",
+    }
   end
 end
