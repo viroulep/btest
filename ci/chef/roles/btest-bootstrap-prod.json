@@ -7,7 +7,7 @@
   "chef_type": "role",
   "run_list": [
     "role[btest-bootstrap]",
-    "recipe[btest::profile]",
+    "recipe[btest::environment]",
     "recipe[btest::ssh]",
     "recipe[btest::clone_repo]",
     "recipe[btest::nginx]",

@@ -6,6 +6,11 @@ export PATH="$HOME/.rbenv/bin:$PATH"
 if command -v rbenv &>/dev/null; then
   eval "$(rbenv init -)"
 fi
+
+# Source global env regardless of (non)login shell.
+# This also sets the RAILS_ENV on prod.
+source /etc/environment
+
 #export LC_ALL=en_US.UTF-8
 
 # If not running interactively, don't do anything else
