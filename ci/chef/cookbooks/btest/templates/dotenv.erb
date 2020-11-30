@@ -1,0 +1,9 @@
+<% key = SecureRandom.hex(64) %>
+<% games_secret = SecureRandom.hex(64) %>
+<%# FIXME: to a helper %>
+<% client = node.chef_environment == "production" ? "https://quizz.virouleau.fr" : "http://localhost:3000" %>
+GOOGLE_CLIENT_ID="GOOGLE_CLIENT_ID"
+GOOGLE_CLIENT_SECRET="GOOGLE_CLIENT_SECRET"
+SECRET_KEY_BASE="<%= key %>"
+GAMES_SECRET="<%= games_secret %>"
+CLIENT_ORIGIN="<%= client %>"

@@ -17,10 +17,6 @@ restart_app() {
 
 deploy() {
   sudo chef-solo -o 'role[btest-app]' -E production -c ../ci/chef/solo.rb -l info
-  set +x
-  # Re-source env in case stuff changed
-  source /home/btest/btest/env/envrc
-  set -x
   restart_app
 }
 

@@ -1,0 +1,4 @@
+# Default global environment variable
+export RAILS_ENV="production"
+# Necessary or puma...
+export RACK_ENV="production"

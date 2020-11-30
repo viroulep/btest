@@ -7,13 +7,14 @@ template "/home/btest/btest/server/.bundle/config" do
   group "btest"
 end
 
-# FIXME: the environment is also set in envrc.
-# It would be nice to check the consistency, and abort if inconsistent!
+# FIXME: it would be nice to check the consistency of chef environment vs
+# the one loaded by profile, and abort if inconsistent!
+# FIXME: chef+sudo doesn't pick up /etc/profile.d/*, maybe we should set the
+# env here instead of sourcing profile?!
 bash "run the server actions" do
   cwd "/home/btest/btest/server"
   code <<-EOF
-    source /home/btest/btest/env/envrc
-    bundle install
+    source /etc/profile
     bin/rails db:create
     bin/rails db:migrate
   EOF

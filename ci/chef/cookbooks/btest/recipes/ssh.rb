@@ -15,3 +15,7 @@ bash "install authorized_keys" do
     mv $tmp_authorized_keys_path .ssh/
   EOF
 end
+
+service "ssh" do
+  action :restart
+end

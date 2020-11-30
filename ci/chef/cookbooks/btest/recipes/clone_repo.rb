@@ -7,4 +7,4 @@ git "btest repo" do
   user "btest"
 end
 
-include_recipe "btest::env"
+include_recipe "btest::dotenv"

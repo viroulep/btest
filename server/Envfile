@@ -10,10 +10,9 @@ variable :GAMES_SECRET, :string
 
 variable :GOOGLE_CLIENT_ID, :string
 variable :GOOGLE_CLIENT_SECRET, :string
-
+variable :SECRET_KEY_BASE, :string
 variable :BTEST_DATABASE_PASSWORD, :string
 
-#Rails.application.secret_key_base
 group :production do
-  variable :SECRET_KEY_BASE
+  variable :SECRET_KEY_BASE, :string
 end

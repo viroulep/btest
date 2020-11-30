@@ -27,5 +27,6 @@ storage/*
 # Ignore master key for decrypting credentials and more.
 config/master.key
 
-.envrc.production
-.envrc.oauth
+.env
+.env.local
+.env.production
