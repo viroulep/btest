@@ -15,6 +15,7 @@ bash "run the server actions" do
   cwd "/home/btest/btest/server"
   code <<-EOF
     source /etc/profile
+    bundle install
     bin/rails db:create
     bin/rails db:migrate
   EOF
