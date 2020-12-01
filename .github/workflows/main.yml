@@ -1,0 +1,44 @@
+name: "CI"
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  IMAGE_TAG: "20201201"
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build_docker_image:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Check docker image exists
+        run: |
+          echo ${{ github.actor }}
+          manifest=$(curl -X GET https://docker.pkg.github.com/v2/viroulep/btest/btest/manifests/$IMAGE_TAG -u ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} | jq '.')
+          echo $manifest
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+  tests:
+    # FIXME: docker image
+    runs-on: ubuntu-latest
+    # FIXME: run tests and upload client's build to artifacts
+    steps:
+      # Runs a single command using the runners shell
+      - name: Run the tests
+        run: echo Hello, world!
