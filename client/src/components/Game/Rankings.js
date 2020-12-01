@@ -1,5 +1,5 @@
 import React from 'react';
-import Marks from '../Answer/Marks';
+
 import {
   Box,
   List,
@@ -10,6 +10,8 @@ import {
   Typography,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+
+import Marks from '../Answer/Marks';
 import FirstIcon from '../Icons/First';
 import SecondIcon from '../Icons/Second';
 import ThirdIcon from '../Icons/Third';

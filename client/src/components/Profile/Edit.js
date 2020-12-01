@@ -1,4 +1,5 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useContext } from 'react';
+
 import {
   Card,
   CardHeader,
@@ -7,6 +8,8 @@ import {
   Typography,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+
+import UserContext from '../../contexts/UserContext';
 import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
 import { updateMeUrl } from '../../requests/routes';
 import Snackbar from '../Snackbar/Snack';
@@ -49,8 +52,8 @@ const handler = (data, setSnack, setError, sync) => {
   // sync !
 };
 
-const EditProfile = ({ me, sync }) => {
-  const { name, anonymous } = me;
+const EditProfile = ({ sync }) => {
+  const { name, anonymous } = useContext(UserContext);
   const nameRef = useRef(null);
   const [newName, setNewName] = useState(
     anonymous ? splitAnonymousName(name) : name
@@ -84,7 +87,7 @@ const EditProfile = ({ me, sync }) => {
       <CardContent>
         <Snackbar snack={snack} setSnack={setSnack} />
         <form noValidate autoComplete="off">
-          {!anonymous && <ProvidedData me={me} />}
+          <ProvidedData />
           <div className={flex}>
             <Typography variant="h6" className={mb}>
               Local data

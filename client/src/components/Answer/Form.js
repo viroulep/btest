@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+
+import { Box, Grid, TextField, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import SendRoundedIcon from '@material-ui/icons/SendRounded';
+
 import { gameAttemptUrl } from '../../requests/routes';
 import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
-import { Box, Grid, TextField, Button } from '@material-ui/core';
-import SendRoundedIcon from '@material-ui/icons/SendRounded';
 import Marks from '../Answer/Marks';
 import FormStatus from './FormStatus';
 

@@ -1,14 +1,21 @@
-import React, { useReducer, useCallback, useState, useEffect } from 'react';
-import Preview from './Preview';
+import React, {
+  useReducer,
+  useCallback,
+  useState,
+  useEffect,
+  useContext,
+} from 'react';
+
 import { Box, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+
+import Preview from './Preview';
 import PastTracks from './PastTracks';
 import Rankings from './Rankings';
 import consumer from '../../channels/consumer';
 import GameState from './State';
 import {
   dispatcher,
-  currentAnswer,
   handleDataReceived,
   startGame,
   stopGame,
@@ -17,6 +24,7 @@ import { updateSnack } from '../../logic/snack';
 import Snackbar from '../Snackbar/Snack';
 import PositiveButton from '../Buttons/Positive';
 import NegativeButton from '../Buttons/Negative';
+import UserContext from '../../contexts/UserContext';
 
 const useStyles = makeStyles((theme) => ({
   botSpace: {
@@ -24,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Game = ({ game, me }) => {
+const Game = ({ game }) => {
   const [state, changeState] = useReducer(dispatcher, game);
   const [preview, setPreview] = useState(null);
   const [snack, setSnack] = useState({
@@ -38,7 +46,7 @@ const Game = ({ game, me }) => {
   ]);
 
   const { slug, rankings, tracks, currentTrack, started, available } = state;
-  const { anonymous } = me;
+  const { anonymous } = useContext(UserContext);
 
   // The subscription
   useEffect(() => {
@@ -60,6 +68,7 @@ const Game = ({ game, me }) => {
 
   const { botSpace } = useStyles();
 
+  // FIXME: create some "actionsforuser" component
   return (
     <>
       <Snackbar snack={snack} setSnack={setSnack} />
@@ -91,7 +100,7 @@ const Game = ({ game, me }) => {
           <GameState
             currentTrack={currentTrack}
             slug={slug}
-            currentAnswer={currentAnswer(rankings, me)}
+            rankings={rankings}
             preview={preview}
           />
         </Grid>

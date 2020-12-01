@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Typography } from '@material-ui/core';
 
 import AnswerForm from '../Answer/Form';
 import PreviewProgress from './PreviewProgress';
+import UserContext from '../../contexts/UserContext';
+import { currentAnswer } from '../../logic/game';
 
 const useStyles = makeStyles((theme) => ({
   stateItem: {
@@ -15,7 +17,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const State = ({ slug, currentTrack, currentAnswer, preview }) => {
+const State = ({ slug, currentTrack, rankings, preview }) => {
+  const me = useContext(UserContext);
   const { stateItem } = useStyles();
   return (
     <>
@@ -26,7 +29,7 @@ const State = ({ slug, currentTrack, currentAnswer, preview }) => {
         <AnswerForm
           slug={slug}
           currentTrack={currentTrack}
-          currentAnswer={currentAnswer}
+          currentAnswer={currentAnswer(rankings, me)}
         />
       </Grid>
       <Grid item xs={12}>

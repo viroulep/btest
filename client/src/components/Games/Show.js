@@ -1,9 +1,10 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
+
 import Game from '../Game/Game';
 import WithLoading from '../WithLoading/WithLoading';
 import useLoadedData from '../../requests/loadable';
 import { gameUrl } from '../../requests/routes';
-import { useParams } from 'react-router-dom';
 
 const GameShow = (props) => {
   const { gameId } = useParams();

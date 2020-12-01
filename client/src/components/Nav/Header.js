@@ -1,4 +1,6 @@
 import React, { useState, useCallback } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+
 import { withStyles } from '@material-ui/core/styles';
 import {
   AppBar,
@@ -12,7 +14,7 @@ import {
 } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import TranslateRoundedIcon from '@material-ui/icons/TranslateRounded';
-import { Link as RouterLink } from 'react-router-dom';
+
 import { signoutUrl } from '../../requests/routes';
 import { availableLocales } from '../../locales/importers';
 

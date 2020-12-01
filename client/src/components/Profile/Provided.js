@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
+
 import { Divider, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+
+import UserContext from '../../contexts/UserContext';
 import { signInProviders } from '../../requests/routes';
 
 const useStyles = makeStyles((theme) => ({
@@ -14,11 +17,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ProvidedData = ({ me }) => {
-  const { provided_name, provider, provided_email } = me;
+const ProvidedData = () => {
+  const { flex, mb } = useStyles();
+
+  const { anonymous, provided_name, provider, provided_email } = useContext(
+    UserContext
+  );
+
+  if (anonymous) return <></>;
+
   const providerData = signInProviders.find((p) => p.id === provider);
   const { name } = providerData;
-  const { flex, mb } = useStyles();
   return (
     <div className={flex}>
       <Typography variant="h6" className={mb}>

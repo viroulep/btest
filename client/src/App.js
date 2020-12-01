@@ -1,7 +1,13 @@
 import React, { useReducer } from 'react';
+import { Switch, Route } from 'react-router-dom';
+import I18n from 'i18n-js';
+
+import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
+import { Grid, Container, CssBaseline } from '@material-ui/core';
+
 import useLoadedData from './requests/loadable';
 import { meUrl } from './requests/routes';
-import './App.css';
 import Welcome from './components/Welcome/Welcome';
 import Breadcrumb from './components/Nav/Breadcrumb';
 import Header from './components/Nav/Header';
@@ -9,12 +15,9 @@ import Footer from './components/Nav/Footer';
 import GamesIndex from './components/Games/Index';
 import GameShow from './components/Games/Show';
 import EditProfile from './components/Profile/Edit';
-import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
-import { ThemeProvider } from '@material-ui/styles';
-import { Grid, Container, CssBaseline } from '@material-ui/core';
-import { Switch, Route } from 'react-router-dom';
-import I18n from 'i18n-js';
+import UserContext from './contexts/UserContext';
 import { useLocale } from './logic/locales';
+import './App.css';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -62,23 +65,23 @@ function App() {
           <Grid item>
             <Container>
               {data && locale ? (
-                <>
+                <UserContext.Provider value={data}>
                   <Breadcrumb />
                   <Switch>
                     <Route path="/games" exact>
-                      <GamesIndex me={data} />
+                      <GamesIndex />
                     </Route>
                     <Route path="/games/:gameId">
-                      <GameShow me={data} />
+                      <GameShow />
                     </Route>
                     <Route path="/profile">
-                      <EditProfile me={data} sync={sync} />
+                      <EditProfile sync={sync} />
                     </Route>
                     <Route path="/">
-                      <Welcome user={data} toggle={toggle} />
+                      <Welcome toggle={toggle} />
                     </Route>
                   </Switch>
-                </>
+                </UserContext.Provider>
               ) : (
                 <p>
                   Still signing you in (if nothing happens within seconds,

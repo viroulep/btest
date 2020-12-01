@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
-import WithLoading from '../WithLoading/WithLoading';
-import useLoadedData from '../../requests/loadable';
+import React, { useState, useCallback, useContext } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+
 import {
   Card,
   CardHeader,
@@ -9,9 +9,12 @@ import {
   ListItem,
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
+
+import useLoadedData from '../../requests/loadable';
+import UserContext from '../../contexts/UserContext';
 import PositiveButton from '../Buttons/Positive';
 import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
-import { Link as RouterLink } from 'react-router-dom';
+import WithLoading from '../WithLoading/WithLoading';
 import { gamesUrl } from '../../requests/routes';
 import Snackbar from '../Snackbar/Snack';
 import { updateSnack } from '../../logic/snack';
@@ -27,7 +30,7 @@ const GamesList = ({ games }) => (
   </List>
 );
 
-const GamesIndex = ({ me }) => {
+const GamesIndex = () => {
   const loadedData = useLoadedData(gamesUrl());
   const { data, sync } = loadedData;
   const [snack, setSnack] = useState({
@@ -43,8 +46,7 @@ const GamesIndex = ({ me }) => {
     });
   }, [setSnack, sync]);
 
-  // FIXME: proper auth support
-  const { anonymous } = me;
+  const { anonymous } = useContext(UserContext);
   const headerAction = anonymous ? (
     ''
   ) : (

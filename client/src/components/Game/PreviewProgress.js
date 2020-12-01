@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import LinearProgress from '@material-ui/core/LinearProgress';
 
 const previewLength = 30;

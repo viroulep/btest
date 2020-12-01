@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
+
+import { Box, Grid, Typography } from '@material-ui/core';
+
 import useLoadedData from '../../requests/loadable';
 import { gameMineUrl } from '../../requests/routes';
-import { Box, Grid, Typography } from '@material-ui/core';
 import Track from '../Track/Track';
 
 const PastTracks = ({ slug, tracks }) => {
