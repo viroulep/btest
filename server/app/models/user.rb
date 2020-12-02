@@ -1,23 +1,17 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
-  has_many :answers, as: :userable, dependent: :destroy
+  @@min_name_length = 1 # rubocop:disable Style/ClassVars
+  include Userable
 
-  # FIXME: create some concern to factorize this
-  # This restriction is here mainly to have a nicely displayed name
-  # Only validate on update, in case the provider gives us something above that.
-  validates :name, length: { minimum: 1, maximum: 50, on: :update }
-
-  def identifiable_attrs
-    {
-      id: id,
-      name: name,
-      anonymous: anonymous?,
-    }
-  end
+  has_many :created_games, class_name: "Game", foreign_key: :created_by, inverse_of: :creator, dependent: :destroy
 
   def anonymous?
     false
+  end
+
+  def admin?
+    provided_email == "philippe.44@gmail.com"
   end
 
   def self.find_or_create_from_auth_hash(auth_hash)

@@ -7,7 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const pathToName = (path) => {
   if (path === '/games') {
-    return 'Games';
+    return 'Your games';
   } else if (path.startsWith('/games/')) {
     return path.substring(7);
   } else if (path === '/profile') {

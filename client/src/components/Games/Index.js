@@ -1,77 +1,72 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
+import { Paper, Tab, Tabs } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+
 import {
-  Card,
-  CardHeader,
-  CardContent,
-  List,
-  ListItem,
-} from '@material-ui/core';
+  availableGamesUrl,
+  pastGamesUrl,
+  adminGamesUrl,
+} from '../../requests/routes';
+
+import UserContext from '../../contexts/UserContext';
+import GamesTab from './GamesTab';
+import Snackbar from '../Snackbar/Snack';
+import PositiveButton from '../Buttons/Positive';
 import AddIcon from '@material-ui/icons/Add';
 
-import useLoadedData from '../../requests/loadable';
-import UserContext from '../../contexts/UserContext';
-import PositiveButton from '../Buttons/Positive';
-import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
-import WithLoading from '../WithLoading/WithLoading';
-import { gamesUrl } from '../../requests/routes';
-import Snackbar from '../Snackbar/Snack';
-import { updateSnack } from '../../logic/snack';
-import { statusForGame } from '../../logic/game';
-
-const GamesList = ({ games }) => (
-  <List>
-    {games.map((v, k) => (
-      <ListItem button component={RouterLink} key={k} to={`/games/${v.slug}`}>
-        Game "{v.slug}" ({statusForGame(v)})
-      </ListItem>
-    ))}
-  </List>
-);
+const useStyles = makeStyles((theme) => ({
+  addButton: {
+    marginBottom: theme.spacing(2),
+  },
+}));
 
 const GamesIndex = () => {
-  const loadedData = useLoadedData(gamesUrl());
-  const { data, sync } = loadedData;
+  // FIXME: this should be a "SnackContext" common to the app!
   const [snack, setSnack] = useState({
     open: false,
     severity: 'success',
     message: '',
   });
 
-  const createGame = useCallback(() => {
-    fetchJsonOrError(gamesUrl(), { method: 'POST' }).then((data) => {
-      updateSnack(data, setSnack);
-      sync();
-    });
-  }, [setSnack, sync]);
-
-  const { anonymous } = useContext(UserContext);
-  const headerAction = anonymous ? (
-    ''
-  ) : (
-    <PositiveButton
-      variant="contained"
-      onClick={createGame}
-      startIcon={<AddIcon />}
-    >
-      Create
-    </PositiveButton>
-  );
+  const { anonymous, admin } = useContext(UserContext);
+  const [activeTab, setActiveTab] = useState(0);
+  const { addButton } = useStyles();
 
   return (
     <>
       <Snackbar snack={snack} setSnack={setSnack} />
-      <Card>
-        <CardHeader title="Games" action={headerAction} />
-        <CardContent>
-          <WithLoading
-            Component={GamesList}
-            loadedData={loadedData}
-            games={data}
-          />
-        </CardContent>
-      </Card>
+      <Paper>
+        {!anonymous && (
+          <PositiveButton
+            className={addButton}
+            variant="contained"
+            //onClick={createGame}
+            startIcon={<AddIcon />}
+            fullWidth
+            component={RouterLink}
+            to="/games/new"
+          >
+            New
+          </PositiveButton>
+        )}
+        <Tabs
+          value={activeTab}
+          indicatorColor="primary"
+          textColor="primary"
+          onChange={(ev, value) => setActiveTab(value)}
+          aria-label="games tabs"
+          centered
+        >
+          <Tab label="Available" />
+          <Tab label="Past" />
+          {admin && <Tab label="Admin" />}
+        </Tabs>
+        <GamesTab active={activeTab} index={0} url={availableGamesUrl} />
+        <GamesTab active={activeTab} index={1} url={pastGamesUrl} />
+        {admin && <GamesTab active={activeTab} index={2} url={adminGamesUrl} />}
+      </Paper>
     </>
   );
 };

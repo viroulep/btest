@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import I18n from 'i18n-js';
 
 import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
@@ -14,6 +14,7 @@ import Header from './components/Nav/Header';
 import Footer from './components/Nav/Footer';
 import GamesIndex from './components/Games/Index';
 import GameShow from './components/Games/Show';
+import GameNew from './components/Games/New';
 import EditProfile from './components/Profile/Edit';
 import UserContext from './contexts/UserContext';
 import { useLocale } from './logic/locales';
@@ -53,7 +54,6 @@ function App() {
 
   // TODO: extract the main entry point with all the theme + route wrapping
   // to some "withRoot" hook taking an entry point as parameter.
-  // TODO: create a loading component
   return (
     <ThemeProvider theme={muiTheme}>
       <CssBaseline />
@@ -70,6 +70,9 @@ function App() {
                   <Switch>
                     <Route path="/games" exact>
                       <GamesIndex />
+                    </Route>
+                    <Route path="/games/new" exact>
+                      {data.anonymous ? <Redirect to="/games" /> : <GameNew />}
                     </Route>
                     <Route path="/games/:gameId">
                       <GameShow />

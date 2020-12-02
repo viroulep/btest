@@ -25,6 +25,7 @@ import Snackbar from '../Snackbar/Snack';
 import PositiveButton from '../Buttons/Positive';
 import NegativeButton from '../Buttons/Negative';
 import UserContext from '../../contexts/UserContext';
+import { usersMatch } from '../../logic/user';
 
 const useStyles = makeStyles((theme) => ({
   botSpace: {
@@ -46,7 +47,9 @@ const Game = ({ game }) => {
   ]);
 
   const { slug, rankings, tracks, currentTrack, started, available } = state;
-  const { anonymous } = useContext(UserContext);
+
+  const user = useContext(UserContext);
+  const canManageGame = user.admin || usersMatch(user, game.createdBy);
 
   // The subscription
   useEffect(() => {
@@ -74,7 +77,7 @@ const Game = ({ game }) => {
       <Snackbar snack={snack} setSnack={setSnack} />
       <Preview preview={preview} />
       <Grid container>
-        {!anonymous && !started && available && (
+        {canManageGame && !started && available && (
           <Grid item xs={12} className={botSpace}>
             <PositiveButton
               fullWidth
@@ -85,7 +88,7 @@ const Game = ({ game }) => {
             </PositiveButton>
           </Grid>
         )}
-        {!anonymous && started && available && (
+        {canManageGame && started && available && (
           <Grid item xs={12} className={botSpace}>
             <NegativeButton
               fullWidth

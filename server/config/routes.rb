@@ -16,7 +16,7 @@ Rails.application.routes.draw do
       post "/start" => "games#start"
       post "/next" => "games#next", as: :next
       post "/abort" => "games#abort"
-      get "/mine" => "games#mine"
+      get "/my_answers" => "games#my_answers"
     end
   end
 end

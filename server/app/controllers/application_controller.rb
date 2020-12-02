@@ -46,4 +46,12 @@ class ApplicationController < ActionController::API
       message: "Can't access this page",
     }
   end
+
+  def redirect_unless_admin!
+    return if current_user.admin?
+
+    render status: :forbidden, json: {
+      message: "Can't access this page",
+    }
+  end
 end

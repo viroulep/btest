@@ -7,9 +7,14 @@ class Game < ApplicationRecord
   SONG_DELAY = 5.seconds
 
   validates :slug, uniqueness: true
+
   serialize :tracks, Tracklist
+
   has_many :answers, dependent: :destroy
+  belongs_to :creator, class_name: "User", foreign_key: :created_by, inverse_of: :created_games
+
   after_save :post_game_cleanup, if: :saved_change_to_finished_at?
+
   default_scope { order(created_at: :desc) }
 
   scope :available, -> { where(aborted_at: nil, finished_at: nil) }
@@ -151,6 +156,10 @@ class Game < ApplicationRecord
                              })
   end
 
+  def can_be_managed_by?(user)
+    user.admin? || creator == user
+  end
+
   def to_json(*_args)
     {
       slug: slug,
@@ -159,6 +168,7 @@ class Game < ApplicationRecord
       tracks: finished_tracks,
       available: available?,
       started: started?,
+      createdBy: creator.identifiable_attrs,
     }
   end
 
@@ -171,7 +181,7 @@ class Game < ApplicationRecord
     slug
   end
 
-  def self.create_one!
+  def self.create_one!(creator)
     # FIXME: proper "music source" class with providers
     # for testing purpose, this is the "2000" mix
 
@@ -179,10 +189,8 @@ class Game < ApplicationRecord
     mix = RestClient.get("https://api.deezer.com/radio/38325/tracks?limit=50")
     data = JSON.parse(mix.body)
     data["data"] = data["data"].sample(15)
-    # FIXME: create a tracklist object
     tracks = Tracklist.from_deezer(data)
-    # FIXME: make sure slug is unique!
-    [Game.create!(slug: Game.generate_slug, tracks: tracks), nil]
+    [Game.create!(slug: Game.generate_slug, tracks: tracks, created_by: creator.id), nil]
   rescue RestClient::ExceptionWithResponse => e
     [nil, e]
   end

@@ -3,13 +3,13 @@ import React, { useEffect } from 'react';
 import { Box, Grid, Typography } from '@material-ui/core';
 
 import useLoadedData from '../../requests/loadable';
-import { gameMineUrl } from '../../requests/routes';
+import { gameMyAnswersUrl } from '../../requests/routes';
 import Track from '../Track/Track';
 
 const PastTracks = ({ slug, tracks }) => {
   // FIXME: although we don't need loading, we should probably throw something
   // if an error shows up.
-  const { data, sync } = useLoadedData(gameMineUrl(slug));
+  const { data, sync } = useLoadedData(gameMyAnswersUrl(slug));
 
   // Sync my past answers when tracks change (new song)
   useEffect(sync, [tracks, sync]);

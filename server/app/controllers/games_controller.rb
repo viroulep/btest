@@ -2,28 +2,33 @@
 
 class GamesController < ApplicationController
   skip_before_action :sign_in_or_anon!, only: [:next]
-  # TODO: proper user check
-  before_action :check_not_anon!, only: [:create, :start, :abort]
   before_action :validate_token!, only: [:next]
-  before_action :set_game!, except: [:create, :index]
+  before_action :check_not_anon!, only: [:create]
+  before_action :set_game!, only: [:show, :start, :next, :abort, :attempt, :my_answers]
+  before_action :redirect_unless_can_manage!, only: [:start, :abort]
+  before_action :redirect_unless_admin!, only: [:index], if: :admin_requested?
 
   TOKEN = ENVied.GAMES_SECRET.freeze
 
-  # TODO: make this admin only?
-  def index
+  def index # rubocop:disable Metrics/AbcSize
+    @games = current_user.games
+    @created_games = current_user.created_games
     @games = case params[:scope]
              when "available"
-               Game.available
+               @games.available + @created_games.available
              when "past"
-               Game.past
+               @games.past + @created_games.past
+             when "admin"
+               Game.all.to_a
              else
-               Game.all
+               @games + @created_games
              end
+    @games.uniq.sort_by! { |g| -g.created_at.to_i }
   end
 
   # TODO: user management
   def create
-    game, err = Game.create_one!
+    game, err = Game.create_one!(current_user)
     render json: {
       success: err.nil?,
       message: err || "Created game #{game.slug}",
@@ -47,7 +52,7 @@ class GamesController < ApplicationController
     render json: { success: true, message: "Started" }
   end
 
-  def mine
+  def my_answers
     answers_by_index = @game.answers_for(current_user)
                             .group_by(&:track_index).transform_values do |a|
       a.first.to_json
@@ -113,7 +118,19 @@ class GamesController < ApplicationController
     raise ActiveRecord::RecordNotFound unless token == TOKEN
   end
 
+  def redirect_unless_can_manage!
+    return if !current_user.anonymous? && @game.can_be_managed_by?(current_user)
+
+    render status: :forbidden, json: {
+      message: "Can't access this page",
+    }
+  end
+
   def set_game!
     @game = Game.find_by!(slug: params[:game_id] || params[:id])
+  end
+
+  def admin_requested?
+    params[:scope] == "admin"
   end
 end
