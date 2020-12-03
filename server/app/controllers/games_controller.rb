@@ -23,7 +23,8 @@ class GamesController < ApplicationController
              else
                @games + @created_games
              end
-    @games.uniq.sort_by! { |g| -g.created_at.to_i }
+    @games.uniq!
+    @games.sort_by! { |g| -g.created_at.to_i }
   end
 
   # TODO: user management
