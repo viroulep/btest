@@ -11,6 +11,7 @@ class User < ApplicationRecord
   end
 
   def admin?
+    # TODO: proper "admin" boolean in User
     provided_email == "philippe.44@gmail.com"
   end
 

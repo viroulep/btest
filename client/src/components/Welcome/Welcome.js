@@ -45,9 +45,6 @@ const Welcome = ({ toggle }) => {
                   profile
                 </Link>
               </Typography>
-              <Alert severity="info">
-                Currently signing in will only work with the developer's email
-              </Alert>
             </Box>
             <List>
               {signInProviders.map((p) => (
