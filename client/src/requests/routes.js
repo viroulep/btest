@@ -23,6 +23,7 @@ export const meUrl = () => `${BASE_URL}/me`;
 export const updateMeUrl = () => `${BASE_URL}/updateMe`;
 export const signoutUrl = () => `${BASE_URL}/signout`;
 export const gamesUrl = () => `${BASE_URL}/games`;
+export const mixesUrl = () => `${BASE_URL}/sources/deezer_mixes`;
 export const pastGamesUrl = () => `${gamesUrl()}?scope=past`;
 export const availableGamesUrl = () => `${gamesUrl()}?scope=available`;
 export const adminGamesUrl = () => `${gamesUrl()}?scope=admin`;

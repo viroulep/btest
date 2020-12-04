@@ -17,13 +17,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const State = ({ slug, currentTrack, rankings, preview }) => {
+const State = ({ game, preview }) => {
   const me = useContext(UserContext);
   const { stateItem } = useStyles();
+  const { slug, currentTrack, rankings, totalTracks } = game;
   return (
     <>
       <Grid item className={stateItem} xs={12} md={2}>
-        <Typography align="center">{currentTrack + 1}/15</Typography>
+        <Typography align="center">
+          {currentTrack + 1}/{totalTracks}
+        </Typography>
       </Grid>
       <Grid item xs={12} md={10}>
         <AnswerForm

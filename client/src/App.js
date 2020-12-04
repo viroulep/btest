@@ -15,6 +15,7 @@ import Footer from './components/Nav/Footer';
 import GamesIndex from './components/Games/Index';
 import GameShow from './components/Games/Show';
 import GameNew from './components/Games/New';
+import AddMix from './components/DeezerMixes/Add';
 import EditProfile from './components/Profile/Edit';
 import UserContext from './contexts/UserContext';
 import { useLocale } from './logic/locales';
@@ -76,6 +77,9 @@ function App() {
                     </Route>
                     <Route path="/games/:gameId">
                       <GameShow />
+                    </Route>
+                    <Route path="/sources/add_deezer_mix" exact>
+                      {data.admin ? <AddMix /> : <Redirect to="/" />}
                     </Route>
                     <Route path="/profile">
                       <EditProfile sync={sync} />

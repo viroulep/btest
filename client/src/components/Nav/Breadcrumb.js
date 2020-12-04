@@ -12,6 +12,10 @@ const pathToName = (path) => {
     return path.substring(7);
   } else if (path === '/profile') {
     return 'Profile';
+  } else if (path === '/sources') {
+    return 'Tracks sources';
+  } else if (path === '/sources/add_deezer_mix') {
+    return 'Deezer Mixes';
   } else {
     return 'unknown';
   }

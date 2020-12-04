@@ -46,7 +46,7 @@ const Game = ({ game }) => {
     setSnack,
   ]);
 
-  const { slug, rankings, tracks, currentTrack, started, available } = state;
+  const { slug, rankings, tracks, started, available } = state;
 
   const user = useContext(UserContext);
   const canManageGame = user.admin || usersMatch(user, game.createdBy);
@@ -100,12 +100,7 @@ const Game = ({ game }) => {
           </Grid>
         )}
         <Grid container item xs={12} className={botSpace}>
-          <GameState
-            currentTrack={currentTrack}
-            slug={slug}
-            rankings={rankings}
-            preview={preview}
-          />
+          <GameState game={game} preview={preview} />
         </Grid>
         <Grid item xs={12} md={6} className={botSpace}>
           <Box mr={{ md: 2 }}>

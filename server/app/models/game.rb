@@ -12,6 +12,7 @@ class Game < ApplicationRecord
 
   has_many :answers, dependent: :destroy
   belongs_to :creator, class_name: "User", foreign_key: :created_by, inverse_of: :created_games
+  belongs_to :sourceable, polymorphic: true
 
   after_save :post_game_cleanup, if: :saved_change_to_finished_at?
 
@@ -166,6 +167,7 @@ class Game < ApplicationRecord
       currentTrack: current_track,
       rankings: rankings,
       tracks: finished_tracks,
+      totalTracks: tracks.size,
       available: available?,
       started: started?,
       createdBy: creator.identifiable_attrs,
@@ -181,18 +183,18 @@ class Game < ApplicationRecord
     slug
   end
 
-  def self.create_one!(creator)
-    # FIXME: proper "music source" class with providers
-    # for testing purpose, this is the "2000" mix
-
-    # Request 50, because the 15 first tend to be very similar
-    mix = RestClient.get("https://api.deezer.com/radio/38325/tracks?limit=50")
-    data = JSON.parse(mix.body)
-    data["data"] = data["data"].sample(15)
-    tracks = Tracklist.from_deezer(data)
-    [Game.create!(slug: Game.generate_slug, tracks: tracks, created_by: creator.id), nil]
-  rescue RestClient::ExceptionWithResponse => e
-    [nil, e]
+  def self.create_one!(creator, number_of_tracks, source)
+    tracks, err = source.get_tracklist(number_of_tracks)
+    if err.nil?
+      [Game.create!(
+        slug: Game.generate_slug,
+        tracks: tracks,
+        created_by: creator.id,
+        sourceable: source,
+      ), nil]
+    else
+      [nil, err] unless err.nil?
+    end
   end
 
   private

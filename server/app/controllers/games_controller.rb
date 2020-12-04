@@ -27,12 +27,35 @@ class GamesController < ApplicationController
     @games.sort_by! { |g| -g.created_at.to_i }
   end
 
-  # TODO: user management
-  def create
-    game, err = Game.create_one!(current_user)
+  def create # rubocop:disable Metrics/AbcSize
+    err = []
+    number_of_tracks = params.require(:length).to_i
+
+    err << "Number of tracks must be between 5 and 50." if number_of_tracks < 5 || number_of_tracks > 50
+
+    # FIXME: the source finding logic could be extracted
+    source_type = params.require(:source).require(:type)
+    source_id = params.require(:source).require(:id)
+    case source_type
+    when "deezer_mix"
+      source = DeezerMix.find_by(id: source_id)
+      err << "The source id provided doesn't exist" unless source
+    else
+      err << "Unknown source of tracks"
+    end
+
+    unless err.empty?
+      return render status: :bad_request, json: {
+        success: false,
+        message: err.join(" "),
+      }
+    end
+
+    game, err = Game.create_one!(current_user, number_of_tracks, source)
     render json: {
       success: err.nil?,
       message: err || "Created game #{game.slug}",
+      newGameSlug: game.slug,
     }
   end
 
