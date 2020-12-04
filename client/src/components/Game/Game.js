@@ -100,7 +100,7 @@ const Game = ({ game }) => {
           </Grid>
         )}
         <Grid container item xs={12} className={botSpace}>
-          <GameState game={game} preview={preview} />
+          <GameState game={state} preview={preview} />
         </Grid>
         <Grid item xs={12} md={6} className={botSpace}>
           <Box mr={{ md: 2 }}>
