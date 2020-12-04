@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
+  before_action :redirect_unless_admin!, except: [:update_me, :me]
+
   def index
     @users = User.all
   end

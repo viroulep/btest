@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_03_184435) do
+ActiveRecord::Schema.define(version: 2020_12_04_163505) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,6 +39,15 @@ ActiveRecord::Schema.define(version: 2020_12_03_184435) do
     t.index ["userable_type", "userable_id"], name: "index_answers_on_userable_type_and_userable_id"
   end
 
+  create_table "deezer_mixes", force: :cascade do |t|
+    t.string "title"
+    t.string "picture"
+    t.string "description"
+    t.string "tracklist"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "games", force: :cascade do |t|
     t.datetime "started_at"
     t.datetime "aborted_at"
@@ -50,8 +59,11 @@ ActiveRecord::Schema.define(version: 2020_12_03_184435) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "created_by", default: 1, null: false
+    t.string "sourceable_type"
+    t.bigint "sourceable_id"
     t.index ["created_by"], name: "index_games_on_created_by"
     t.index ["slug"], name: "index_games_on_slug", unique: true
+    t.index ["sourceable_type", "sourceable_id"], name: "index_games_on_sourceable_type_and_sourceable_id"
   end
 
   create_table "users", force: :cascade do |t|

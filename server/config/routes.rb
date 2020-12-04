@@ -18,5 +18,9 @@ Rails.application.routes.draw do
       post "/abort" => "games#abort"
       get "/my_answers" => "games#my_answers"
     end
+
+    scope "/sources" do
+      resources :deezer_mixes, only: [:index, :create]
+    end
   end
 end
