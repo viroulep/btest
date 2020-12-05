@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useState, useRef, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
@@ -19,6 +19,7 @@ import WithLoading from '../WithLoading/WithLoading';
 import useLoadedData from '../../requests/loadable';
 import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
 import { gamesUrl, mixesUrl } from '../../requests/routes';
+import SnackContext from '../../contexts/SnackContext';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -38,6 +39,7 @@ const NewGameForm = ({ mixes }) => {
   const lengthRef = useRef(null);
   const [mix, setMix] = useState('');
   const mixRef = useRef(null);
+  const openSnack = useContext(SnackContext);
   const createGameAction = useCallback(() => {
     fetchJsonOrError(gamesUrl(), {
       method: 'POST',
@@ -49,13 +51,16 @@ const NewGameForm = ({ mixes }) => {
           id: mixRef.current.value,
         },
       }),
-    })
-      .then((data) => {
+    }).then((data) => {
+      const { success, message, newGameSlug } = data;
+      if (success) {
         // Nagivate to the list of available games
-        history.push(`/games/${data.newGameSlug}`);
-      })
-      .catch((error) => alert(`Something went wrong: ${error}`));
-  }, [history]);
+        history.push(`/games/${newGameSlug}`);
+      } else {
+        openSnack({ message });
+      }
+    });
+  }, [history, openSnack]);
 
   const { ml } = useStyles();
   return (
