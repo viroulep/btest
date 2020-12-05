@@ -6,8 +6,6 @@ import {
   FormControlLabel,
   Grid,
   Input,
-  Select,
-  MenuItem,
   Paper,
   Typography,
   Button,
@@ -20,6 +18,7 @@ import useLoadedData from '../../requests/loadable';
 import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
 import { gamesUrl, mixesUrl } from '../../requests/routes';
 import SnackContext from '../../contexts/SnackContext';
+import DeezerMixInput from './DeezerMixInput';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -38,7 +37,6 @@ const NewGameForm = ({ mixes }) => {
   const [length, setLength] = useState(15);
   const lengthRef = useRef(null);
   const [mix, setMix] = useState('');
-  const mixRef = useRef(null);
   const openSnack = useContext(SnackContext);
   const createGameAction = useCallback(() => {
     fetchJsonOrError(gamesUrl(), {
@@ -48,7 +46,7 @@ const NewGameForm = ({ mixes }) => {
         length: lengthRef.current.value,
         source: {
           type: 'deezer_mix',
-          id: mixRef.current.value,
+          id: mix,
         },
       }),
     }).then((data) => {
@@ -60,7 +58,7 @@ const NewGameForm = ({ mixes }) => {
         openSnack({ message });
       }
     });
-  }, [history, openSnack]);
+  }, [history, openSnack, mix]);
 
   const { ml } = useStyles();
   return (
@@ -83,26 +81,10 @@ const NewGameForm = ({ mixes }) => {
         />
       </Grid>
       <Grid item>
-        <FormControlLabel
-          control={
-            <Select
-              className={ml}
-              inputProps={{
-                ref: mixRef,
-              }}
-              value={mix}
-              onChange={(e) => setMix(e.target.value)}
-            >
-              {mixes.map((mix) => (
-                <MenuItem key={mix.id} value={mix.id}>
-                  {mix.title}
-                </MenuItem>
-              ))}
-            </Select>
-          }
-          label="Deezer mix"
-          labelPlacement="start"
-        />
+        <Typography variant="h5">Deezer mix</Typography>
+      </Grid>
+      <Grid item>
+        <DeezerMixInput selected={mix} setSelected={setMix} />
       </Grid>
       <Grid item>
         <Button variant="contained" color="primary" onClick={createGameAction}>
