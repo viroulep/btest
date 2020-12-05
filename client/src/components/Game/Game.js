@@ -1,10 +1,4 @@
-import React, {
-  useReducer,
-  useCallback,
-  useState,
-  useEffect,
-  useContext,
-} from 'react';
+import React, { useReducer, useState, useEffect, useContext } from 'react';
 
 import { Box, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -20,11 +14,10 @@ import {
   startGame,
   stopGame,
 } from '../../logic/game';
-import { updateSnack } from '../../logic/snack';
-import Snackbar from '../Snackbar/Snack';
 import PositiveButton from '../Buttons/Positive';
 import NegativeButton from '../Buttons/Negative';
 import UserContext from '../../contexts/UserContext';
+import SnackContext from '../../contexts/SnackContext';
 import { usersMatch } from '../../logic/user';
 
 const useStyles = makeStyles((theme) => ({
@@ -36,15 +29,7 @@ const useStyles = makeStyles((theme) => ({
 const Game = ({ game }) => {
   const [state, changeState] = useReducer(dispatcher, game);
   const [preview, setPreview] = useState(null);
-  const [snack, setSnack] = useState({
-    open: false,
-    severity: 'success',
-    message: '',
-  });
-
-  const snackCallback = useCallback((data) => updateSnack(data, setSnack), [
-    setSnack,
-  ]);
+  const openSnack = useContext(SnackContext);
 
   const { slug, rankings, tracks, started, available } = state;
 
@@ -74,7 +59,6 @@ const Game = ({ game }) => {
   // FIXME: create some "actionsforuser" component
   return (
     <>
-      <Snackbar snack={snack} setSnack={setSnack} />
       <Preview preview={preview} />
       <Grid container>
         {canManageGame && !started && available && (
@@ -82,7 +66,7 @@ const Game = ({ game }) => {
             <PositiveButton
               fullWidth
               variant="contained"
-              onClick={() => startGame(slug, snackCallback)}
+              onClick={() => startGame(slug, openSnack)}
             >
               Start
             </PositiveButton>
@@ -93,7 +77,7 @@ const Game = ({ game }) => {
             <NegativeButton
               fullWidth
               variant="contained"
-              onClick={() => stopGame(slug, snackCallback)}
+              onClick={() => stopGame(slug, openSnack)}
             >
               Abort game
             </NegativeButton>

@@ -13,6 +13,7 @@ import {
   Button,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Alert } from '@material-ui/lab';
 
 import WithLoading from '../WithLoading/WithLoading';
 import useLoadedData from '../../requests/loadable';
@@ -108,8 +109,6 @@ const NewGameForm = ({ mixes }) => {
 };
 
 const NewGame = () => {
-  // TODO: handle error... (with application-wide snackbar!)
-
   const loadedData = useLoadedData(mixesUrl());
   const { data } = loadedData;
 
@@ -119,10 +118,10 @@ const NewGame = () => {
         <Grid container spacing={2} direction="column">
           <Grid item>
             <Typography variant="h4">Create a game</Typography>
-            <Typography>
+            <Alert severity="info">
               The number of tracks must be between 5 and 50, and you must select
               a mix to take the tracks from.
-            </Typography>
+            </Alert>
           </Grid>
           <WithLoading
             Component={NewGameForm}

@@ -13,7 +13,6 @@ import {
   ListItemText,
   Typography,
 } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
 import PersonIcon from '@material-ui/icons/Person';
 
 import UserContext from '../../contexts/UserContext';
