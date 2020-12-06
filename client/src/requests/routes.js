@@ -33,3 +33,5 @@ export const gameMyAnswersUrl = (id) => `${gameUrl(id)}/my_answers`;
 export const gameStartUrl = (id) => `${gameUrl(id)}/start`;
 export const gameStopUrl = (id) => `${gameUrl(id)}/abort`;
 export const cableUrl = () => `${BASE_URL}/cable`;
+export const getDeezerPlaylistUrl = (id) =>
+  `${BASE_URL}/deezer_playlists/import/${id}`;

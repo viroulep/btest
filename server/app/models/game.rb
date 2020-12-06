@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Game < ApplicationRecord
-  SONG_SOURCE = "https://api.deezer.com/radio/38325/tracks"
   START_DELAY = 5.seconds
   SONG_DURATION = 30.seconds
   SONG_DELAY = 5.seconds

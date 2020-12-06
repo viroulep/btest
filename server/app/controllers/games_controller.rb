@@ -34,11 +34,14 @@ class GamesController < ApplicationController
     err << "Number of tracks must be between 5 and 50." if number_of_tracks < 5 || number_of_tracks > 50
 
     # FIXME: the source finding logic could be extracted
-    source_params = params.require(:source).permit(:id, :type)
+    source_params = params.require(:source).permit(:data, :type)
     case source_params[:type]
     when "deezer_mix"
-      source = DeezerMix.find_by(id: source_params[:id])
+      source = DeezerMix.find_by(id: source_params[:data])
       err << "The source id provided doesn't exist" unless source
+    when "playlists"
+      source, source_err = DeezerPlaylist.from_ids(source_params[:data])
+      err << source_err unless source
     else
       err << "Unknown source of tracks"
     end

@@ -22,5 +22,7 @@ Rails.application.routes.draw do
     scope "/sources" do
       resources :deezer_mixes, only: [:index, :create]
     end
+
+    get "/deezer_playlists/import/:playlist_id" => "deezer_playlists#import_from_deezer"
   end
 end

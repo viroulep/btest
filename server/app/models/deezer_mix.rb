@@ -12,14 +12,16 @@
 # 42202 - hard rock
 class DeezerMix < ApplicationRecord
   validates :tracklist, :title, :description, :picture, presence: true
+  has_many :games, as: :sourceable, dependent: :destroy
 
   def get_tracklist(quantity)
     # Return a Tracklist with 'quantity' random songs from the mix,
     # or nil if we can't get them.
     response = RestClient.get("#{tracklist}?limit=50")
     data = JSON.parse(response.body)
-    data["data"] = data["data"].sample(quantity)
-    [Tracklist.from_deezer(data), nil]
+    # Filter out non-readable tracks
+    tracks = data["data"].select { |track| track["readable"] }.sample(quantity)
+    [Tracklist.from_deezer(tracks), nil]
   rescue RestClient::ExceptionWithResponse => e
     [nil, e]
   end

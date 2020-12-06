@@ -35,5 +35,5 @@ Metrics/ClassLength:
 Metrics/MethodLength:
   Enabled: false
 
-ClassAndModuleChildren:
+Style/ClassAndModuleChildren:
   EnforcedStyle: compact

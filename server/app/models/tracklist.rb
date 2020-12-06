@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class Tracklist < Array
-  # FIXME: create this as part of a "provider" object
   def self.from_deezer(json)
-    json["data"].map { |t| Track.from_deezer(t) }
+    json.map { |t| Track.from_deezer(t) }
   end
 
   def self.load(json)

@@ -65,6 +65,25 @@ const statusForGame = (game) => {
   }
 };
 
+const getPlaylistIdFromUrl = (input) => {
+  try {
+    const parsedURL = new URL(input);
+    const parts = parsedURL.pathname.split('/');
+    // Deezer may include a locale in the url
+    while (parts.length > 2) {
+      parts.shift();
+    }
+    const endpoint = parts[0];
+    const playlistId = parseInt(parts[1]);
+    if (endpoint !== 'playlist' || Object.is(playlistId, NaN)) {
+      return undefined;
+    }
+    return playlistId;
+  } catch (error) {
+    return undefined;
+  }
+};
+
 export {
   dispatcher,
   currentAnswer,
@@ -72,4 +91,5 @@ export {
   stopGame,
   handleDataReceived,
   statusForGame,
+  getPlaylistIdFromUrl,
 };

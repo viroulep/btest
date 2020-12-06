@@ -1,51 +1,10 @@
 import React from 'react';
 
-import {
-  Card,
-  CardMedia,
-  CardContent,
-  CardActionArea,
-  Grid,
-  Typography,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Grid } from '@material-ui/core';
 
 import useLoadedData from '../../requests/loadable';
 import { mixesUrl } from '../../requests/routes';
-
-const useStyles = makeStyles((theme) => ({
-  image: {
-    height: 140,
-    backgroundColor: theme.palette.text.secondary,
-  },
-  selected: {
-    borderColor: theme.palette.success.main,
-    borderWidth: '3px',
-    borderStyle: 'solid',
-  },
-}));
-
-const CardForMix = ({ selected, setSelected, mix }) => {
-  const classes = useStyles();
-  const { id, picture, title } = mix;
-  return (
-    <Card className={selected === id ? classes.selected : ''}>
-      <CardActionArea onClick={() => setSelected(id)}>
-        <CardMedia
-          className={classes.image}
-          image={picture}
-          component="div"
-          title={`Cover for ${title}`}
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h6" component="h4">
-            {title}
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-};
+import CardForObject from './CardForObject';
 
 const DeezerMixInput = ({ selected, setSelected }) => {
   const loadedData = useLoadedData(mixesUrl());
@@ -53,12 +12,12 @@ const DeezerMixInput = ({ selected, setSelected }) => {
   return (
     <Grid container spacing={2}>
       <Grid item>
-        <CardForMix
-          selected={selected}
-          setSelected={setSelected}
-          mix={{
+        <CardForObject
+          selected={selected === ''}
+          action={() => setSelected('')}
+          object={{
             picture: '',
-            id: '',
+            description: '',
             title: 'None',
           }}
         />
@@ -66,10 +25,10 @@ const DeezerMixInput = ({ selected, setSelected }) => {
       {data &&
         data.map((mix) => (
           <Grid item key={mix.id}>
-            <CardForMix
-              selected={selected}
-              setSelected={setSelected}
-              mix={mix}
+            <CardForObject
+              selected={selected === mix.id}
+              action={() => setSelected(mix.id)}
+              object={mix}
             />
           </Grid>
         ))}
