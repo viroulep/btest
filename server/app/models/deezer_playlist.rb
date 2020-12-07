@@ -38,7 +38,7 @@ class DeezerPlaylist < ApplicationRecord
     [nil, e]
   end
 
-  def get_tracklist(quantity) # rubocop:disable Metrics/AbcSize
+  def get_tracklist(quantity) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     tracklists_data = playlists.map do |playlist|
       response = RestClient.get(playlist["tracklist"])
       data = JSON.parse(response.body)
@@ -57,6 +57,7 @@ class DeezerPlaylist < ApplicationRecord
       quantity.times do
         source = tracklists_data.sample
         picked << source.delete(source.sample)
+        tracklists_data.delete(source) if source.empty?
       end
     end
 
