@@ -6,9 +6,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
-  FormControlLabel,
   Grid,
-  Input,
   Typography,
   Button,
 } from '@material-ui/core';
@@ -21,16 +19,10 @@ import { gamesUrl } from '../../requests/routes';
 import SnackContext from '../../contexts/SnackContext';
 import DeezerMixInput from './DeezerMixInput';
 import PlaylistsInput from './PlaylistsInput';
+import ValidatorSelect from './ValidatorSelect';
+import LengthInput from './LengthInput';
 
 const useStyles = makeStyles((theme) => ({
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  ml: {
-    marginLeft: theme.spacing(2),
-  },
   heading: {
     flexBasis: '33%',
     flexShrink: 0,
@@ -75,8 +67,8 @@ const SourceAccordion = ({
 const NewGameForm = () => {
   // FIXME: really need error handling here...
   const history = useHistory();
-  const [length, setLength] = useState(15);
   const lengthRef = useRef(null);
+  const validatorRef = useRef(null);
   const [mix, setMix] = useState('');
   const [playlists, setPlaylists] = useState({});
   const openSnack = useContext(SnackContext);
@@ -100,6 +92,7 @@ const NewGameForm = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         length: lengthRef.current.value,
+        validator: validatorRef.current.value.toLowerCase(),
         source: {
           type: selectedSource,
           data: sourceData,
@@ -118,25 +111,13 @@ const NewGameForm = () => {
       .finally(() => setLoading(false));
   }, [history, openSnack, mix, playlists, selectedSource, setLoading]);
 
-  const { ml } = useStyles();
   return (
     <>
       <Grid item>
-        <FormControlLabel
-          control={
-            <Input
-              type="number"
-              className={ml}
-              inputProps={{
-                ref: lengthRef,
-              }}
-              value={length}
-              onChange={(e) => setLength(e.target.value)}
-            />
-          }
-          label="Number of tracks"
-          labelPlacement="start"
-        />
+        <LengthInput ref={lengthRef} />
+      </Grid>
+      <Grid item>
+        <ValidatorSelect ref={validatorRef} />
       </Grid>
       <Grid item>
         <SourceAccordion

@@ -2,21 +2,19 @@
 
 class Answer < ApplicationRecord
   FAST_DELAY = 10
-  belongs_to :userable, polymorphic: true
-  belongs_to :game
+  belongs_to :userable, polymorphic: true, inverse_of: :answers
+  belongs_to :game, inverse_of: :answers
   before_save :set_total_points
+  delegate :validator, to: :game
 
   # NOTE: 'input' is a user-provided string, we don't want to do anything fancy
   # with it!
-  # returns a boolean with a reason. (true if something validated, false if
-  # nothing worked)
+  # returns a boolean with a reason. (true if something validated, false otherwise)
   def process_attempt!(input, timestamp)
     reason = reason_to_reject(timestamp)
     return [false, reason] if reason
 
-    tokens = StringTransform.tokenize(input)
-
-    newly_found_artist, newly_found_title = update_from_tokens(tokens)
+    anything_changed, found_artist, found_title = update_from_input(input)
 
     self.validated_at = timestamp if correct?
 
@@ -26,10 +24,12 @@ class Answer < ApplicationRecord
       # We may have to update top3!
       game.rank_correct_answers(track_index)
       [true, "Great job, you got everything!"]
-    elsif newly_found_title
+    elsif found_title
       [true, "You just need the artist now!"]
-    elsif newly_found_artist
+    elsif found_artist
       [true, "Alright, do you know the song's title now?"]
+    elsif anything_changed
+      [false, "Not quite complete, but you found something!"]
     else
       [false, "Nop"]
     end
@@ -94,18 +94,13 @@ class Answer < ApplicationRecord
     end
   end
 
-  def update_from_tokens(tokens)
-    newly_found_artist = false
-    unless correct_artist?
-      self.artist_parts = artist_parts - tokens
-      newly_found_artist = correct_artist?
-    end
+  def update_from_input(input)
+    parts = validator.build_ref(input)
 
-    newly_found_title = false
-    unless correct_title?
-      self.title_parts = title_parts - tokens
-      newly_found_title = correct_title?
-    end
-    [newly_found_artist, newly_found_title]
+    found_artist = validator.validate(artist_parts, parts) unless correct_artist?
+    found_title = validator.validate(title_parts, parts) unless correct_title?
+    found_something = artist_parts_changed? || title_parts_changed?
+
+    [found_something, found_artist, found_title]
   end
 end

@@ -1,15 +1,18 @@
 # frozen_string_literal: true
 
 class Game < ApplicationRecord
-  START_DELAY = 5.seconds
-  SONG_DURATION = 30.seconds
-  SONG_DELAY = 5.seconds
+  START_DELAY = 5.seconds.freeze
+  SONG_DURATION = 30.seconds.freeze
+  SONG_DELAY = 5.seconds.freeze
+  AVAILABLE_VALIDATORS = ["levenshtein", "metaphone"].freeze
+
+  validates :validator_name, inclusion: { in: AVAILABLE_VALIDATORS }
 
   validates :slug, uniqueness: true
 
   serialize :tracks, Tracklist
 
-  has_many :answers, dependent: :destroy
+  has_many :answers, dependent: :destroy, inverse_of: :game
   belongs_to :creator, class_name: "User", foreign_key: :created_by, inverse_of: :created_games
   belongs_to :sourceable, polymorphic: true
 
@@ -51,7 +54,7 @@ class Game < ApplicationRecord
     running? && current_track >= 0
   end
 
-  def find_or_create_answer_for!(user)
+  def find_or_create_answer_for!(user) # rubocop:disable Metrics/AbcSize
     return nil unless active_track?
 
     existing = user.answers.find_by(game: self, track_index: current_track)
@@ -59,8 +62,8 @@ class Game < ApplicationRecord
 
     track = tracks[current_track]
     attrs = {
-      artist_parts: track.artist_parts,
-      title_parts: track.title_parts,
+      artist_parts: validator.build_ref(track.artist),
+      title_parts: validator.build_ref(track.title),
       track_index: current_track,
       track_started_at: current_track_started_at,
       userable: user,
@@ -160,6 +163,17 @@ class Game < ApplicationRecord
     user.admin? || creator == user
   end
 
+  def validator
+    case validator_name
+    when "metaphone"
+      Validators::Metaphone
+    when "levenshtein"
+      Validators::Levenshtein
+    else # rubocop:disable Lint/DuplicateBranch
+      Validators::Levenshtein
+    end
+  end
+
   def to_json(*_args)
     {
       slug: slug,
@@ -182,7 +196,7 @@ class Game < ApplicationRecord
     slug
   end
 
-  def self.create_one!(creator, number_of_tracks, source)
+  def self.create_one!(creator, number_of_tracks, source, validator)
     tracks, err = source.get_tracklist(number_of_tracks)
     if err.nil?
       [Game.create!(
@@ -190,6 +204,7 @@ class Game < ApplicationRecord
         tracks: tracks,
         created_by: creator.id,
         sourceable: source,
+        validator_name: validator,
       ), nil]
     else
       [nil, err] unless err.nil?

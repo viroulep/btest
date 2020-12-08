@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_06_151859) do
+ActiveRecord::Schema.define(version: 2020_12_08_154752) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -67,6 +67,7 @@ ActiveRecord::Schema.define(version: 2020_12_06_151859) do
     t.integer "created_by", default: 1, null: false
     t.string "sourceable_type"
     t.bigint "sourceable_id"
+    t.string "validator_name", default: "levenshtein", null: false
     t.index ["created_by"], name: "index_games_on_created_by"
     t.index ["slug"], name: "index_games_on_slug", unique: true
     t.index ["sourceable_type", "sourceable_id"], name: "index_games_on_sourceable_type_and_sourceable_id"

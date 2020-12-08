@@ -3,15 +3,11 @@
 class Track
   attr_accessor :title, :artist, :cover_url, :sample_url
 
-  attr_reader :artist_parts, :title_parts
-
   def initialize(title, artist, cover_url, sample_url)
     @title = title
     @artist = artist
     @cover_url = cover_url
     @sample_url = sample_url
-    @title_parts = StringTransform.tokenize(title)
-    @artist_parts = StringTransform.tokenize(artist)
   end
 
   # FIXME: create this as part of a "provider" object

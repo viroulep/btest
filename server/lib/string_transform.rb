@@ -2,7 +2,9 @@
 
 module StringTransform
   # Returns an array of "cleaned up" token from the given string.
-  # Eg: "jEan-jaccques GOLDMAN" -> ["jean", "jacques", "goldman"]
+  # Eg: "jEan-jaccques GOLDMAN" -> ["jean", "jaccques", "goldman"]
+  # We don't do any kind of "correction" on the tokens: the levenshtein distance
+  # will take care of this.
   def self.tokenize(input)
     # First transliterate the string to remove any non ascii char (like the 'e' acute)
     input = I18n.transliterate(input)
@@ -11,7 +13,8 @@ module StringTransform
     # complement song titles).
     input.gsub!(/\([^)]*\)/, "")
 
-    # TODO: remove also "[some text]"
+    # And stuff in brackets
+    input.gsub!(/\[[^\]]*\]/, "")
 
     # Turn any non alphanumeric char into blanks
     input.gsub!(/[^0-9a-zA-Z]/, " ")
@@ -19,13 +22,8 @@ module StringTransform
     # Downcase to normalize
     input.downcase!
 
-    # Be tolerant for some chars
-    input.tr!("y", "i")
-
-    # Squeeze the thing, this both:
-    #   - get rid of duplicate blank spaces
-    #   - introduce a tolerance for duplicate letters by removing them
-    input.squeeze!
+    # Squeeze the thing, so that spliting by " " makes sense
+    input.squeeze!(" ")
 
     # Finally return the thing as an array
     input.split

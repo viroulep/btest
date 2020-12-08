@@ -29,9 +29,15 @@ class GamesController < ApplicationController
 
   def create # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     err = []
+
+    # FIXME: this belongs to the model's validation logic.
+    # We should build a game object, call 'save' on it, and return errors if any.
     number_of_tracks = params.require(:length).to_i
 
     err << "Number of tracks must be between 5 and 50." if number_of_tracks < 5 || number_of_tracks > 50
+
+    validator = params.require(:validator)
+    err << "Invalid validator" unless Game::AVAILABLE_VALIDATORS.include?(validator)
 
     # FIXME: the source finding logic could be extracted
     source_params = params.require(:source).permit(:data, :type)
@@ -46,7 +52,7 @@ class GamesController < ApplicationController
       err << "Unknown source of tracks"
     end
 
-    game, game_err = Game.create_one!(current_user, number_of_tracks, source) if err.empty?
+    game, game_err = Game.create_one!(current_user, number_of_tracks, source, validator) if err.empty?
     err << game_err if game_err
 
     render json: {
