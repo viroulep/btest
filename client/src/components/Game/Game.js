@@ -3,7 +3,6 @@ import React, { useReducer, useState, useEffect, useContext } from 'react';
 import { Box, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import Preview from './Preview';
 import PastTracks from './PastTracks';
 import Rankings from './Rankings';
 import consumer from '../../channels/consumer';
@@ -59,7 +58,6 @@ const Game = ({ game }) => {
   // FIXME: create some "actionsforuser" component
   return (
     <>
-      <Preview preview={preview} />
       <Grid container>
         {canManageGame && !started && available && (
           <Grid item xs={12} className={botSpace}>

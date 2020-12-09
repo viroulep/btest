@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const Preview = ({ preview }) => {
+const Preview = ({ preview, volume }) => {
   const [audio] = useState(new Audio());
   useEffect(() => {
     if (!preview) return;
@@ -8,6 +8,10 @@ const Preview = ({ preview }) => {
     audio.play();
     return () => audio.pause();
   }, [preview, audio]);
+
+  useEffect(() => {
+    audio.volume = volume / 100;
+  }, [audio, volume]);
   return <div className="PreviewElement"></div>;
 };
 
