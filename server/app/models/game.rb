@@ -211,6 +211,12 @@ class Game < ApplicationRecord
     end
   end
 
+  def self.create_from!(creator, game)
+    return ["No source, can't use the game as model", nil] unless game.sourceable
+
+    create_one!(creator, game.tracks.size, game.sourceable, game.validator_name)
+  end
+
   private
 
   def post_game_cleanup

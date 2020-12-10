@@ -17,6 +17,7 @@ import PositiveButton from '../Buttons/Positive';
 import NegativeButton from '../Buttons/Negative';
 import UserContext from '../../contexts/UserContext';
 import SnackContext from '../../contexts/SnackContext';
+import CloneGameButton from './CloneGameButton';
 import { usersMatch } from '../../logic/user';
 
 const useStyles = makeStyles((theme) => ({
@@ -79,6 +80,11 @@ const Game = ({ game }) => {
             >
               Abort game
             </NegativeButton>
+          </Grid>
+        )}
+        {canManageGame && !available && (
+          <Grid item xs={12} className={botSpace}>
+            <CloneGameButton slug={slug} />
           </Grid>
         )}
         <Grid container item xs={12} className={botSpace}>

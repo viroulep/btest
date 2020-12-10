@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       post "/start" => "games#start"
       post "/next" => "games#next", as: :next
       post "/abort" => "games#abort"
+      post "/clone" => "games#create_from"
       get "/my_answers" => "games#my_answers"
     end
 
