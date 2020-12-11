@@ -12,6 +12,7 @@ import Breadcrumb from './components/Nav/Breadcrumb';
 import Header from './components/Nav/Header';
 import Footer from './components/Nav/Footer';
 import GamesIndex from './components/Games/Index';
+import UsersIndex from './components/Users/Index';
 import GameShow from './components/Games/Show';
 import GameNew from './components/Games/New';
 import AddMix from './components/DeezerMixes/Add';
@@ -74,6 +75,11 @@ function App() {
                     <Container>
                       <Breadcrumb />
                       <Switch>
+                        {data.admin && (
+                          <Route path="/users" exact>
+                            <UsersIndex />
+                          </Route>
+                        )}
                         <Route path="/games" exact>
                           <GamesIndex />
                         </Route>

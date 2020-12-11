@@ -36,3 +36,5 @@ export const gameStopUrl = (id) => `${gameUrl(id)}/abort`;
 export const cableUrl = () => `${BASE_URL}/cable`;
 export const getDeezerPlaylistUrl = (id) =>
   `${BASE_URL}/deezer_playlists/import/${id}`;
+export const usersUrl = () => `${BASE_URL}/users`;
+export const userUrl = (id) => `${usersUrl()}/${id}`;

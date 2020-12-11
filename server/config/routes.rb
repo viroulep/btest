@@ -7,7 +7,7 @@ Rails.application.routes.draw do
     # This route is only used by the "developer" provider
     post "/auth/:provider/callback", to: "sessions#create" unless Rails.env.production?
     get "/signout", to: "sessions#destroy"
-    resources :users, only: [:index, :show]
+    resources :users, only: [:index, :show, :update]
     get "/me" => "users#me"
     post "/updateMe" => "users#update_me"
 

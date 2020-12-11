@@ -69,11 +69,18 @@ const Welcome = ({ toggle }) => {
           </Typography>
         )}
         {user.admin && (
-          <Typography>
-            <Link to="/sources/add_deezer_mix" component={RouterLink}>
-              Add a deezer mix
-            </Link>
-          </Typography>
+          <>
+            <Typography>
+              <Link to="/sources/add_deezer_mix" component={RouterLink}>
+                Add a deezer mix
+              </Link>
+            </Typography>
+            <Typography>
+              <Link to="/users" component={RouterLink}>
+                Users index
+              </Link>
+            </Typography>
+          </>
         )}
       </CardContent>
     </Card>
