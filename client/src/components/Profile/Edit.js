@@ -12,7 +12,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import UserContext from '../../contexts/UserContext';
 import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
 import { updateMeUrl } from '../../requests/routes';
-import Snackbar from '../Snackbar/Snack';
+import SnackContext from '../../contexts/SnackContext';
 import PositiveButton from '../Buttons/Positive';
 import ProvidedData from './Provided';
 
@@ -38,20 +38,6 @@ const nameToRequestParams = (name) => ({
   body: JSON.stringify({ user: { name } }),
 });
 
-const handler = (data, setSnack, setError, sync) => {
-  const { success, message } = data;
-  if (success) {
-    setSnack({
-      open: true,
-      message: 'Succesfully upated your name!',
-    });
-    sync();
-  } else {
-    setError(message);
-  }
-  // sync !
-};
-
 const EditProfile = ({ sync }) => {
   const { name, anonymous } = useContext(UserContext);
   const nameRef = useRef(null);
@@ -59,9 +45,7 @@ const EditProfile = ({ sync }) => {
     anonymous ? splitAnonymousName(name) : name
   );
   const [error, setError] = useState('');
-  const [snack, setSnack] = useState({
-    open: false,
-  });
+  const openSnack = useContext(SnackContext);
   const { flex, mb } = useStyles();
   const updateName = useCallback(
     (ev) => {
@@ -70,13 +54,20 @@ const EditProfile = ({ sync }) => {
       if (anonymous) {
         nameParam = prefixAnonymousName(nameParam);
       }
-      // TODO: catch
-      fetchJsonOrError(
-        updateMeUrl(),
-        nameToRequestParams(nameParam)
-      ).then((data) => handler(data, setSnack, setError, sync));
+      fetchJsonOrError(updateMeUrl(), nameToRequestParams(nameParam)).then(
+        (data) => {
+          const { success, message } = data;
+          if (success) {
+            openSnack(data);
+            setError('');
+            sync();
+          } else {
+            setError(message);
+          }
+        }
+      );
     },
-    [anonymous, nameRef, setSnack, setError, sync]
+    [anonymous, nameRef, setError, sync, openSnack]
   );
 
   return (
@@ -85,7 +76,6 @@ const EditProfile = ({ sync }) => {
         title={<Typography variant="h4">Edit your profile</Typography>}
       />
       <CardContent>
-        <Snackbar snack={snack} setSnack={setSnack} />
         <form noValidate autoComplete="off">
           <ProvidedData />
           <div className={flex}>

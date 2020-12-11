@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link as RouterLink, Route } from 'react-router-dom';
-import I18n from 'i18n-js';
 
 import { Breadcrumbs, Link, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+
+import LocaleContext from '../../contexts/LocaleContext';
 
 const pathToName = (path) => {
   if (path === '/games') {
@@ -29,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Breadcrumb = () => {
   const { botSpace } = useStyles();
+  const { I18n } = useContext(LocaleContext);
   return (
     <Route>
       {({ location }) => {

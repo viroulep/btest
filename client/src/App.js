@@ -1,6 +1,5 @@
 import React, { useReducer } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
-import I18n from 'i18n-js';
 
 import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
@@ -19,9 +18,9 @@ import AddMix from './components/DeezerMixes/Add';
 import EditProfile from './components/Profile/Edit';
 import UserContext from './contexts/UserContext';
 import SnackContext from './contexts/SnackContext';
-import { useLocale } from './hooks/locale';
 import useSnackbar from './hooks/snackbar';
 import Snackbar from './components/Snackbar/Snack';
+import WithLocale from './components/WithLocale/WithLocale';
 import './App.css';
 
 const useStyles = makeStyles((theme) => ({
@@ -46,12 +45,6 @@ function App() {
     return state === 'light' ? 'dark' : 'light';
   }, 'light');
 
-  // NOTE: I don't think we need the locale anywhere else, but if we do we
-  // should create a LocaleContext provider.
-  const { locale, setLocale } = useLocale(data);
-  I18n.locale = locale;
-  I18n.fallbacks = true;
-
   const { snack, setSnack, openSnack } = useSnackbar();
 
   const muiTheme = createMuiTheme({
@@ -70,53 +63,55 @@ function App() {
       <Snackbar snack={snack} setSnack={setSnack} />
       <SnackContext.Provider value={openSnack}>
         <div className={classes.root}>
-          <Grid container direction="column" className={classes.grow}>
-            <Grid item>
-              <Header user={data} setLocale={setLocale} />
-            </Grid>
-            <Grid item>
-              <Container>
-                {data && locale ? (
-                  <UserContext.Provider value={data}>
-                    <Breadcrumb />
-                    <Switch>
-                      <Route path="/games" exact>
-                        <GamesIndex />
-                      </Route>
-                      <Route path="/games/new" exact>
-                        {data.anonymous ? (
-                          <Redirect to="/games" />
-                        ) : (
-                          <GameNew />
-                        )}
-                      </Route>
-                      <Route path="/games/:gameId">
-                        <GameShow />
-                      </Route>
-                      <Route path="/sources/add_deezer_mix" exact>
-                        {data.admin ? <AddMix /> : <Redirect to="/" />}
-                      </Route>
-                      <Route path="/profile">
-                        <EditProfile sync={sync} />
-                      </Route>
-                      <Route path="/">
-                        <Welcome toggle={toggle} />
-                      </Route>
-                    </Switch>
-                  </UserContext.Provider>
-                ) : (
-                  <p>
-                    Still signing you in (if nothing happens within seconds,
-                    something is most likely wrong).
-                  </p>
-                )}
-              </Container>
-            </Grid>
-            <Grid item className={classes.grow} />
-            <Grid item>
-              <Footer toggle={toggle} />
-            </Grid>
-          </Grid>
+          {data ? (
+            <UserContext.Provider value={data}>
+              <WithLocale>
+                <Grid container direction="column" className={classes.grow}>
+                  <Grid item>
+                    <Header />
+                  </Grid>
+                  <Grid item>
+                    <Container>
+                      <Breadcrumb />
+                      <Switch>
+                        <Route path="/games" exact>
+                          <GamesIndex />
+                        </Route>
+                        <Route path="/games/new" exact>
+                          {data.anonymous ? (
+                            <Redirect to="/games" />
+                          ) : (
+                            <GameNew />
+                          )}
+                        </Route>
+                        <Route path="/games/:gameId">
+                          <GameShow />
+                        </Route>
+                        <Route path="/sources/add_deezer_mix" exact>
+                          {data.admin ? <AddMix /> : <Redirect to="/" />}
+                        </Route>
+                        <Route path="/profile">
+                          <EditProfile sync={sync} />
+                        </Route>
+                        <Route path="/">
+                          <Welcome toggle={toggle} />
+                        </Route>
+                      </Switch>
+                    </Container>
+                  </Grid>
+                  <Grid item className={classes.grow} />
+                  <Grid item>
+                    <Footer toggle={toggle} />
+                  </Grid>
+                </Grid>
+              </WithLocale>
+            </UserContext.Provider>
+          ) : (
+            <p>
+              Still signing you in (if nothing happens within seconds, something
+              is most likely wrong).
+            </p>
+          )}
         </div>
       </SnackContext.Provider>
     </ThemeProvider>

@@ -13,9 +13,10 @@ class UsersController < ApplicationController
 
   def update_me
     @user = current_user
-    if @user.update(params.require(:user).permit(:name))
+    if @user.update(params.require(:user).permit(:name, :locale))
       render json: {
         success: true,
+        message: "Successfully saved your changes to your profile",
       }
     else
       render json: {

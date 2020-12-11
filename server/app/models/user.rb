@@ -11,8 +11,7 @@ class User < ApplicationRecord
   end
 
   def admin?
-    # TODO: proper "admin" boolean in User
-    provided_email == "philippe.44@gmail.com"
+    admin
   end
 
   def self.find_or_create_from_auth_hash(auth_hash)

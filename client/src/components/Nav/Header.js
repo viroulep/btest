@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -17,6 +17,8 @@ import TranslateRoundedIcon from '@material-ui/icons/TranslateRounded';
 
 import { signoutUrl } from '../../requests/routes';
 import { availableLocales } from '../../locales/importers';
+import UserContext from '../../contexts/UserContext';
+import LocaleContext from '../../contexts/LocaleContext';
 
 const styles = (theme) => ({
   grow: {
@@ -27,8 +29,9 @@ const styles = (theme) => ({
   },
 });
 
-const Header = ({ classes, user, setLocale }) => {
+const Header = ({ classes }) => {
   const [open, setOpen] = useState(null);
+  const { setLocale } = useContext(LocaleContext);
   const handleAction = (action, ev) => {
     if (action === 'open') {
       setOpen(ev.currentTarget);
@@ -43,6 +46,7 @@ const Header = ({ classes, user, setLocale }) => {
     },
     [setOpen, setLocale]
   );
+  const user = useContext(UserContext);
 
   // FIXME: mobile menu
   return (
@@ -53,23 +57,19 @@ const Header = ({ classes, user, setLocale }) => {
             Btest
           </Typography>
           <div className={classes.grow} />
-          {user && (
-            <>
-              <Typography variant="h6" component="h2" className={classes.mr}>
-                {user.name}
-              </Typography>
-              <IconButton
-                edge="end"
-                aria-label="account of current user"
-                component={RouterLink}
-                to="/profile"
-                color="inherit"
-                className={classes.mr}
-              >
-                <AccountCircle />
-              </IconButton>
-            </>
-          )}
+          <Typography variant="h6" component="h2" className={classes.mr}>
+            {user.name}
+          </Typography>
+          <IconButton
+            edge="end"
+            aria-label="account of current user"
+            component={RouterLink}
+            to="/profile"
+            color="inherit"
+            className={classes.mr}
+          >
+            <AccountCircle />
+          </IconButton>
           <IconButton
             edge="end"
             aria-label="locale of current user"
@@ -93,7 +93,7 @@ const Header = ({ classes, user, setLocale }) => {
               </MenuItem>
             ))}
           </Menu>
-          {user && !user.anonymous && (
+          {!user.anonymous && (
             <Button href={signoutUrl()} color="secondary" variant="contained">
               signout
             </Button>
