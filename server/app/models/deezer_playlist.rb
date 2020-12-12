@@ -65,4 +65,11 @@ class DeezerPlaylist < ApplicationRecord
   rescue RestClient::ExceptionWithResponse => e
     [nil, e]
   end
+
+  def to_json(*_args)
+    {
+      id: id,
+      playlists: playlists,
+    }
+  end
 end

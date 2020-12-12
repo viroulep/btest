@@ -3,16 +3,20 @@ import React, { useContext, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   Box,
+  Checkbox,
   Grid,
   Popover,
   Slider,
   Typography,
   IconButton,
 } from '@material-ui/core';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+import InfoIcon from '@material-ui/icons/Info';
 
 import AnswerForm from '../Answer/Form';
 import Preview from './Preview';
 import PreviewProgress from './PreviewProgress';
+import Status from './Status';
 import UserContext from '../../contexts/UserContext';
 import { currentAnswer } from '../../logic/game';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
@@ -38,6 +42,7 @@ const State = ({ game, preview }) => {
   const [volume, setVolume] = useState(80);
   const { stateItem, volumeButtonRoot, popoverRoot } = useStyles();
   const { slug, currentTrack, rankings, totalTracks } = game;
+  const [showStatus, setShowStatus] = useState(!game.available);
   return (
     <>
       <Grid item className={stateItem} xs={12} md={2}>
@@ -53,6 +58,12 @@ const State = ({ game, preview }) => {
           >
             <VolumeUpIcon />
           </IconButton>
+          <Checkbox
+            checked={showStatus}
+            onChange={(ev) => setShowStatus(ev.target.checked)}
+            icon={<InfoOutlinedIcon />}
+            checkedIcon={<InfoIcon />}
+          />
         </Box>
         <Popover
           open={Boolean(anchorEl)}
@@ -85,6 +96,11 @@ const State = ({ game, preview }) => {
       <Grid item xs={12}>
         <PreviewProgress preview={preview} />
       </Grid>
+      {showStatus && (
+        <Grid item xs={12}>
+          <Status game={game} />
+        </Grid>
+      )}
     </>
   );
 };

@@ -174,7 +174,7 @@ class Game < ApplicationRecord
     end
   end
 
-  def to_json(*_args)
+  def to_json(*_args) # rubocop:disable Metrics/AbcSize
     {
       slug: slug,
       currentTrack: current_track,
@@ -183,7 +183,16 @@ class Game < ApplicationRecord
       totalTracks: tracks.size,
       available: available?,
       started: started?,
+      finished: finished?,
+      aborted: aborted?,
       createdBy: creator.identifiable_attrs,
+      source: if sourceable.present?
+                {
+                  type: sourceable_type,
+                  data: sourceable.to_json,
+                }
+              end,
+      validator: validator_name.capitalize,
     }
   end
 

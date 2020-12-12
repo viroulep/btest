@@ -36,4 +36,11 @@ class DeezerMix < ApplicationRecord
       tracklist: data["tracklist"],
     )
   end
+
+  def to_json(*_args)
+    {
+      id: id,
+      title: title,
+    }
+  end
 end
