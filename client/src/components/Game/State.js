@@ -81,6 +81,7 @@ const State = ({ game, preview }) => {
           <Box className={popoverRoot} my={1} mx={3}>
             <Slider
               value={volume}
+              color="secondary"
               onChange={(ev, newValue) => setVolume(newValue)}
             />
           </Box>

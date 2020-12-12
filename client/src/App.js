@@ -2,6 +2,8 @@ import React, { useReducer } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 
 import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
+import pink from '@material-ui/core/colors/pink';
+import blue from '@material-ui/core/colors/blue';
 import { ThemeProvider } from '@material-ui/styles';
 import { Grid, Container, CssBaseline } from '@material-ui/core';
 
@@ -50,7 +52,28 @@ function App() {
 
   const muiTheme = createMuiTheme({
     palette: {
+      primary: {
+        main: pink[800],
+      },
+      secondary: {
+        main: blue[700],
+      },
       type: theme,
+    },
+    overrides: {
+      MuiLink: {
+        root: {
+          color: pink[400],
+        },
+      },
+      MuiTab: {
+        textColorPrimary: {
+          color: pink[400],
+          '&$selected': {
+            color: pink[400],
+          },
+        },
+      },
     },
   });
 
