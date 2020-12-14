@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import Game from '../Game/Game';
+import InteractionWrapper from '../Game/InteractionWrapper';
 import WithLoading from '../WithLoading/WithLoading';
 import useLoadedData from '../../requests/loadable';
 import { gameUrl } from '../../requests/routes';
@@ -12,7 +12,7 @@ const GameShow = (props) => {
   const { data } = loadedData;
   return (
     <WithLoading
-      Component={Game}
+      Component={InteractionWrapper}
       game={data}
       loadedData={loadedData}
       {...props}

@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useState, useEffect } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 
 import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
@@ -43,6 +43,23 @@ function App() {
   // NOTE: we need to make *sure* to load the user before doing anything else!
   // Failure to do so may result to duplicate anonymous user.
   const { data, sync } = useLoadedData(meUrl());
+
+  // A simple effect to track if the user has interacted with the page.
+  // The aim is to check if we should display a modal when they join a game,
+  // so that their browser doesn't block the autoplay of the songs.
+  const [hasInteracted, setHasInteracted] = useState(false);
+  useEffect(() => {
+    const handler = () => setHasInteracted(true);
+    // We just need the event listener until the user actually interacted.
+    if (!hasInteracted) {
+      window.addEventListener('click', handler, false);
+    }
+    return () => {
+      if (!hasInteracted) {
+        window.removeEventListener('click', handler, false);
+      }
+    };
+  }, [hasInteracted, setHasInteracted]);
 
   const [theme, toggle] = useReducer((state) => {
     return state === 'light' ? 'dark' : 'light';
@@ -114,7 +131,7 @@ function App() {
                           )}
                         </Route>
                         <Route path="/games/:gameId">
-                          <GameShow />
+                          <GameShow hasInteracted={hasInteracted} />
                         </Route>
                         <Route path="/sources/add_deezer_mix" exact>
                           {data.admin ? <AddMix /> : <Redirect to="/" />}
