@@ -12,13 +12,15 @@ import {
 } from '@material-ui/core';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import InfoIcon from '@material-ui/icons/Info';
+import ShareIcon from '@material-ui/icons/Share';
 
 import AnswerForm from '../Answer/Form';
 import Preview from './Preview';
 import PreviewProgress from './PreviewProgress';
 import Status from './Status';
 import UserContext from '../../contexts/UserContext';
-import { currentAnswer } from '../../logic/game';
+import SnackContext from '../../contexts/SnackContext';
+import { currentAnswer, copyUrlToClipboard } from '../../logic/game';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 
 const useStyles = makeStyles((theme) => ({
@@ -38,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
 
 const State = ({ game, preview }) => {
   const me = useContext(UserContext);
+  const openSnack = useContext(SnackContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const [volume, setVolume] = useState(80);
   const { stateItem, volumeButtonRoot, popoverRoot } = useStyles();
@@ -64,6 +67,13 @@ const State = ({ game, preview }) => {
             icon={<InfoOutlinedIcon />}
             checkedIcon={<InfoIcon />}
           />
+          <IconButton
+            color="secondary"
+            aria-label="change volume"
+            onClick={() => copyUrlToClipboard(openSnack)}
+          >
+            <ShareIcon />
+          </IconButton>
         </Box>
         <Popover
           open={Boolean(anchorEl)}

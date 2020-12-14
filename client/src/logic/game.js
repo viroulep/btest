@@ -84,6 +84,18 @@ const getPlaylistIdFromUrl = (input) => {
   }
 };
 
+const copyUrlToClipboard = async (openSnack) => {
+  if (!navigator.clipboard) {
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    openSnack({ success: true, message: 'URL copied to clipboard!' });
+  } catch (err) {
+    openSnack(err);
+  }
+};
+
 export {
   dispatcher,
   currentAnswer,
@@ -92,4 +104,5 @@ export {
   handleDataReceived,
   statusForGame,
   getPlaylistIdFromUrl,
+  copyUrlToClipboard,
 };
