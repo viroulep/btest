@@ -5,7 +5,7 @@ class GamesController < ApplicationController
   before_action :validate_token!, only: [:next]
   before_action :check_not_anon!, only: [:create, :create_from]
   before_action :set_game!, only: [:show, :start, :next, :abort, :attempt, :my_answers, :create_from]
-  before_action :redirect_unless_can_manage!, only: [:start, :abort, :create_from]
+  before_action :redirect_unless_can_manage!, only: [:start, :abort]
   before_action :redirect_unless_admin!, only: [:index], if: :admin_requested?
 
   TOKEN = ENVied.GAMES_SECRET.freeze
@@ -28,7 +28,7 @@ class GamesController < ApplicationController
   end
 
   def create_from
-    # This action is restricted to people who can manage the @game
+    # This action is restricted to non-anonymous users
     game, game_err = Game.create_from!(current_user, @game)
     render json: {
       success: game_err.blank?,

@@ -82,7 +82,7 @@ const Game = ({ game }) => {
             </NegativeButton>
           </Grid>
         )}
-        {canManageGame && !available && (
+        {!user.anonymous && !available && (
           <Grid item xs={12} className={botSpace}>
             <CloneGameButton slug={slug} />
           </Grid>
