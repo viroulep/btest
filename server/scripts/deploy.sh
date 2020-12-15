@@ -23,7 +23,7 @@ deploy() {
 
 # Simple proxy to make sure we get the latest version of the script to deploy
 pull_deploy() {
-  sudo chef-solo -o 'best::clone_repo' -E production -c ../ci/chef/solo.rb -l info
+  sudo chef-solo -o 'btest::clone_repo' -E production -c ../ci/chef/solo.rb -l info
   scripts/deploy.sh deploy
 }
 
