@@ -6,7 +6,6 @@
   "override_attributes": { },
   "chef_type": "role",
   "run_list": [
-    "recipe[btest::clone_repo]",
     "recipe[btest::pg]",
     "recipe[btest::install_server]"
   ]

@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-pull_latest() {
-  git pull
-}
-
 restart_app() {
   if ps -efw | grep "puma" | grep -v grep; then
     # Found a puma process, restart it gracefully
@@ -15,12 +11,23 @@ restart_app() {
   fi
 }
 
+restart_dj() {
+  bin/delayed_job restart
+}
+
 deploy() {
   sudo chef-solo -o 'role[btest-app]' -E production -c ../ci/chef/solo.rb -l info
+  restart_dj
   restart_app
+}
+
+# Simple proxy to make sure we get the latest version of the script to deploy
+pull_deploy() {
+  sudo chef-solo -o 'best::clone_repo' -E production -c ../ci/chef/solo.rb -l info
+  scripts/deploy.sh deploy
 }
 
 cd "$(dirname "$0")"/..
 
-allowed_commands="restart_app deploy pull_latest"
+allowed_commands="restart_app restart_dj deploy pull_deploy"
 source scripts/_parse_args.sh
