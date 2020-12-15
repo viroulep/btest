@@ -1,6 +1,3 @@
-import { gameStartUrl, gameStopUrl } from '../requests/routes';
-import { fetchJsonOrError } from '../requests/fetchJsonOrError';
-
 const dispatcher = (state, action) => {
   const { type, data } = action;
   switch (type) {
@@ -21,14 +18,6 @@ const currentAnswer = (rankings, me) => {
     (el) => el.id === me.id && el.anonymous === me.anonymous
   );
   return myRank ? myRank.current : null;
-};
-
-const stopGame = (slug, setMsg) => {
-  fetchJsonOrError(gameStopUrl(slug), { method: 'POST' }).then(setMsg);
-};
-
-const startGame = (slug, setMsg) => {
-  fetchJsonOrError(gameStartUrl(slug), { method: 'POST' }).then(setMsg);
 };
 
 const handleDataReceived = (data, changeState, setPreview) => {
@@ -99,8 +88,6 @@ const copyUrlToClipboard = async (openSnack) => {
 export {
   dispatcher,
   currentAnswer,
-  startGame,
-  stopGame,
   handleDataReceived,
   statusForGame,
   getPlaylistIdFromUrl,

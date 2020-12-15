@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useContext } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
@@ -14,9 +14,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Alert } from '@material-ui/lab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
+import { usePostFetch } from '../../hooks/requests';
 import { gamesUrl } from '../../requests/routes';
-import SnackContext from '../../contexts/SnackContext';
 import DeezerMixInput from './DeezerMixInput';
 import PlaylistsInput from './PlaylistsInput';
 import ValidatorSelect from './ValidatorSelect';
@@ -71,7 +70,7 @@ const NewGameForm = () => {
   const validatorRef = useRef(null);
   const [mix, setMix] = useState('');
   const [playlists, setPlaylists] = useState({});
-  const openSnack = useContext(SnackContext);
+  const { fetcher, openSnack } = usePostFetch();
   const [loading, setLoading] = useState(false);
 
   const [selectedSource, setSelectedSource] = useState('');
@@ -87,17 +86,13 @@ const NewGameForm = () => {
         .join(',');
     }
     setLoading(true);
-    fetchJsonOrError(gamesUrl(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        length: lengthRef.current.value,
-        validator: validatorRef.current.value.toLowerCase(),
-        source: {
-          type: selectedSource,
-          data: sourceData,
-        },
-      }),
+    fetcher(gamesUrl(), {
+      length: lengthRef.current.value,
+      validator: validatorRef.current.value.toLowerCase(),
+      source: {
+        type: selectedSource,
+        data: sourceData,
+      },
     })
       .then((data) => {
         const { success, message, newGameSlug } = data;
@@ -109,7 +104,7 @@ const NewGameForm = () => {
         }
       })
       .finally(() => setLoading(false));
-  }, [history, openSnack, mix, playlists, selectedSource, setLoading]);
+  }, [history, openSnack, mix, playlists, selectedSource, setLoading, fetcher]);
 
   return (
     <>

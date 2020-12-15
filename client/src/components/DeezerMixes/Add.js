@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { Box, Paper, TextField, Typography } from '@material-ui/core';
 
 import { mixesUrl } from '../../requests/routes';
-import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
+import { usePostFetch } from '../../hooks/requests';
 import PositiveButton from '../Buttons/Positive';
 
 const AddMix = () => {
@@ -12,6 +12,7 @@ const AddMix = () => {
   const [disabled, setDisabled] = useState(false);
   const inputRef = useRef(null);
   const history = useHistory();
+  const { fetcher } = usePostFetch();
 
   const addMixAction = useCallback(
     (ev) => {
@@ -19,16 +20,11 @@ const AddMix = () => {
       setDisabled(true);
 
       const mixIdValue = inputRef.current.value;
-      // TODO: catch
-      fetchJsonOrError(mixesUrl(), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mix_id: mixIdValue }),
-      })
+      fetcher(mixesUrl(), { mix_id: mixIdValue })
         .then(() => history.push('/'))
-        .finally(() => setDisabled(false));
+        .catch(() => setDisabled(false));
     },
-    [inputRef, setDisabled, history]
+    [inputRef, setDisabled, history, fetcher]
   );
   return (
     <Paper>

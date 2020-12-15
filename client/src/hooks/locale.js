@@ -1,17 +1,16 @@
-import { useState, useEffect, useCallback, useContext } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import { availableLocales, localeImporters } from '../locales/importers';
 import I18n from 'i18n-js';
-import SnackContext from '../contexts/SnackContext';
-import { fetchJsonOrError } from '../requests/fetchJsonOrError';
 import { updateMeUrl } from '../requests/routes';
+import { usePostFetch } from './requests';
 
 // Always import the English locale to be able to fallback!
 import '../locales/en';
 
 export const useLocale = (defaultLocale) => {
   const [locale, setCurrentLocale] = useState(null);
-  const openSnack = useContext(SnackContext);
+  const { fetcher, openSnack } = usePostFetch();
 
   const importAndSetLocale = useCallback(
     (requested) => {
@@ -40,16 +39,12 @@ export const useLocale = (defaultLocale) => {
         // Set the locale locally
         importAndSetLocale(requested);
         // Then try saving the preference in the profile
-        fetchJsonOrError(updateMeUrl(), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user: { locale: requested } }),
-        }).then(openSnack);
+        fetcher(updateMeUrl(), { user: { locale: requested } }).then(openSnack);
       } else {
         setTimeout(() => openSnack({ message: 'Invalid locale' }), 0);
       }
     },
-    [importAndSetLocale, openSnack]
+    [importAndSetLocale, openSnack, fetcher]
   );
 
   // NOTE: we provide the I18n helper from here, so make the hook the source

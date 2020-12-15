@@ -10,9 +10,8 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import UserContext from '../../contexts/UserContext';
-import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
+import { usePostFetch } from '../../hooks/requests';
 import { updateMeUrl } from '../../requests/routes';
-import SnackContext from '../../contexts/SnackContext';
 import PositiveButton from '../Buttons/Positive';
 import ProvidedData from './Provided';
 
@@ -32,12 +31,6 @@ const prefix = 'anonymous_';
 const splitAnonymousName = (name) => name.replace(prefix, '');
 const prefixAnonymousName = (name) => `${prefix}${name}`;
 
-const nameToRequestParams = (name) => ({
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ user: { name } }),
-});
-
 const EditProfile = ({ sync }) => {
   const { name, anonymous } = useContext(UserContext);
   const nameRef = useRef(null);
@@ -45,7 +38,7 @@ const EditProfile = ({ sync }) => {
     anonymous ? splitAnonymousName(name) : name
   );
   const [error, setError] = useState('');
-  const openSnack = useContext(SnackContext);
+  const { fetcher, openSnack } = usePostFetch();
   const { flex, mb } = useStyles();
   const updateName = useCallback(
     (ev) => {
@@ -54,20 +47,18 @@ const EditProfile = ({ sync }) => {
       if (anonymous) {
         nameParam = prefixAnonymousName(nameParam);
       }
-      fetchJsonOrError(updateMeUrl(), nameToRequestParams(nameParam)).then(
-        (data) => {
-          const { success, message } = data;
-          if (success) {
-            openSnack(data);
-            setError('');
-            sync();
-          } else {
-            setError(message);
-          }
+      fetcher(updateMeUrl(), { user: { name: nameParam } }).then((data) => {
+        const { success, message } = data;
+        if (success) {
+          openSnack(data);
+          setError('');
+          sync();
+        } else {
+          setError(message);
         }
-      );
+      });
     },
-    [anonymous, nameRef, setError, sync, openSnack]
+    [anonymous, nameRef, setError, sync, openSnack, fetcher]
   );
 
   return (

@@ -7,16 +7,12 @@ import PastTracks from './PastTracks';
 import Rankings from './Rankings';
 import consumer from '../../channels/consumer';
 import GameState from './State';
-import {
-  dispatcher,
-  handleDataReceived,
-  startGame,
-  stopGame,
-} from '../../logic/game';
+import { dispatcher, handleDataReceived } from '../../logic/game';
+import { usePostFetch } from '../../hooks/requests';
+import { gameStartUrl, gameStopUrl } from '../../requests/routes';
 import PositiveButton from '../Buttons/Positive';
 import NegativeButton from '../Buttons/Negative';
 import UserContext from '../../contexts/UserContext';
-import SnackContext from '../../contexts/SnackContext';
 import CloneGameButton from './CloneGameButton';
 import { usersMatch } from '../../logic/user';
 
@@ -29,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 const Game = ({ game }) => {
   const [state, changeState] = useReducer(dispatcher, game);
   const [preview, setPreview] = useState(null);
-  const openSnack = useContext(SnackContext);
+  const { fetcher, openSnack } = usePostFetch();
 
   const { slug, rankings, tracks, started, available } = state;
 
@@ -56,28 +52,23 @@ const Game = ({ game }) => {
 
   const { botSpace } = useStyles();
 
+  const startAction = () => fetcher(gameStartUrl(slug), {}).then(openSnack);
+  const stopAction = () => fetcher(gameStopUrl(slug), {}).then(openSnack);
+
   // FIXME: create some "actionsforuser" component
   return (
     <>
       <Grid container>
         {canManageGame && !started && available && (
           <Grid item xs={12} className={botSpace}>
-            <PositiveButton
-              fullWidth
-              variant="contained"
-              onClick={() => startGame(slug, openSnack)}
-            >
+            <PositiveButton fullWidth variant="contained" onClick={startAction}>
               Start
             </PositiveButton>
           </Grid>
         )}
         {canManageGame && started && available && (
           <Grid item xs={12} className={botSpace}>
-            <NegativeButton
-              fullWidth
-              variant="contained"
-              onClick={() => stopGame(slug, openSnack)}
-            >
+            <NegativeButton fullWidth variant="contained" onClick={stopAction}>
               Abort game
             </NegativeButton>
           </Grid>

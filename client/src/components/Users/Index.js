@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import {
   Paper,
@@ -13,29 +13,26 @@ import {
 } from '@material-ui/core';
 
 import useLoadedData from '../../requests/loadable';
-import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
+import { usePostFetch } from '../../hooks/requests';
 import { usersUrl, userUrl } from '../../requests/routes';
 import WithLoading from '../WithLoading/WithLoading';
-import SnackContext from '../../contexts/SnackContext';
 
 const UsersList = ({ users, sync }) => {
-  const openSnack = useContext(SnackContext);
   const [loading, setLoading] = useState(null);
+  const { fetcher, openSnack } = usePostFetch();
   const toggleUserAdmin = useCallback(
     (id, admin) => {
       setLoading(id);
-      fetchJsonOrError(userUrl(id), {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user: { admin } }),
-      })
+      fetcher(userUrl(id), { user: { admin } }, { method: 'PATCH' })
         .then((data) => {
           if (data.success) sync();
           openSnack(data);
         })
-        .finally(() => setLoading(null));
+        // Only update the state if the request fails, as it will be naturally
+        // updated when the users list refreshes!
+        .catch(() => setLoading(null));
     },
-    [sync, openSnack]
+    [sync, openSnack, setLoading, fetcher]
   );
   return (
     <TableContainer component={Paper}>

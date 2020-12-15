@@ -12,6 +12,7 @@
 # 42202 - hard rock
 class DeezerMix < ApplicationRecord
   validates :tracklist, :title, :description, :picture, presence: true
+  validates :id, uniqueness: true
   has_many :games, as: :sourceable, dependent: :destroy
 
   def get_tracklist(quantity)

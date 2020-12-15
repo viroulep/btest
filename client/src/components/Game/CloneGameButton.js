@@ -1,19 +1,18 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { Button } from '@material-ui/core';
 
 import { gameCloneUrl } from '../../requests/routes';
-import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
-import SnackContext from '../../contexts/SnackContext';
+import { usePostFetch } from '../../hooks/requests';
 
 const CloneGameButton = ({ slug }) => {
-  const openSnack = useContext(SnackContext);
   const history = useHistory();
+  const { fetcher, openSnack } = usePostFetch();
   const [loading, setLoading] = useState(false);
   const cloneGame = useCallback(() => {
     setLoading(true);
-    fetchJsonOrError(gameCloneUrl(slug), { method: 'POST' })
+    fetcher(gameCloneUrl(slug), {})
       .then((data) => {
         const { success, message, newGameSlug } = data;
         if (success) {
@@ -24,7 +23,7 @@ const CloneGameButton = ({ slug }) => {
         }
       })
       .finally(() => setLoading(false));
-  }, [slug, history, openSnack]);
+  }, [slug, history, openSnack, fetcher]);
 
   return (
     <Button

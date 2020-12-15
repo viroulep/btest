@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 
 import {
   Box,
@@ -11,10 +11,9 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
+import { useFetch } from '../../hooks/requests';
 import { getPlaylistIdFromUrl } from '../../logic/game';
 import { getDeezerPlaylistUrl } from '../../requests/routes';
-import SnackContext from '../../contexts/SnackContext';
 
 const useStyles = makeStyles(() => ({
   card: {
@@ -30,7 +29,7 @@ const useStyles = makeStyles(() => ({
 const AddPlaylistCard = ({ playlists, setPlaylists }) => {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const openSnack = useContext(SnackContext);
+  const { fetcher, openSnack } = useFetch();
   const classes = useStyles();
   const addPlaylist = useCallback(
     (input) => {
@@ -51,7 +50,7 @@ const AddPlaylistCard = ({ playlists, setPlaylists }) => {
         );
       } else {
         setLoading(true);
-        fetchJsonOrError(getDeezerPlaylistUrl(playlistId))
+        fetcher(getDeezerPlaylistUrl(playlistId))
           .then((data) => {
             setPlaylists((old) => {
               const newPlaylists = {
@@ -74,7 +73,7 @@ const AddPlaylistCard = ({ playlists, setPlaylists }) => {
           });
       }
     },
-    [setLoading, setUrl, playlists, setPlaylists, openSnack]
+    [setLoading, setUrl, playlists, setPlaylists, openSnack, fetcher]
   );
   return (
     <Card className={classes.card} variant="outlined">

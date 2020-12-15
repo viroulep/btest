@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import SendRoundedIcon from '@material-ui/icons/SendRounded';
 
 import { gameAttemptUrl } from '../../requests/routes';
-import { fetchJsonOrError } from '../../requests/fetchJsonOrError';
+import { usePostFetch } from '../../hooks/requests';
 import Marks from '../Answer/Marks';
 import FormStatus from './FormStatus';
 
@@ -38,6 +38,7 @@ const AnswerForm = ({ slug, currentTrack, currentAnswer }) => {
   const [value, setValue] = useState('');
   const [status, setStatus] = useState(defaultStatus);
   const refTextField = useRef(null);
+  const { fetcher } = usePostFetch();
 
   // Reset on game/track change
   useEffect(() => {
@@ -52,17 +53,12 @@ const AnswerForm = ({ slug, currentTrack, currentAnswer }) => {
       if (query.length <= 0) {
         return;
       }
-      const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ q: query }),
-      };
-      fetchJsonOrError(gameAttemptUrl(slug), requestOptions).then(setStatus);
+      fetcher(gameAttemptUrl(slug), { q: query }).then(setStatus);
       setValue('');
       // Set the focus back to the text field
       refTextField.current.focus();
     },
-    [slug, setValue, setStatus]
+    [slug, setValue, setStatus, fetcher]
   );
 
   const { grow, fullHeight, toUpper, gridInput, marksItem } = useStyles();

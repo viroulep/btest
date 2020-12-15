@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchJsonOrError } from './fetchJsonOrError';
+import { useFetch } from '../hooks/requests';
 
 // This is a hook that can be used to get a data from the website (as json)
 // It assumes that 'url' is a valid, GET-able, url.
@@ -9,11 +9,12 @@ const useLoadedData = (url) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { fetcher } = useFetch();
 
   const sync = useCallback(() => {
     setLoading(true);
     setError(null);
-    fetchJsonOrError(url)
+    fetcher(url)
       .then((loaded) => {
         setData(loaded);
       })
@@ -21,7 +22,7 @@ const useLoadedData = (url) => {
         setError(err.message);
       })
       .finally(() => setLoading(false));
-  }, [url, setData, setError]);
+  }, [url, setData, setError, fetcher]);
 
   useEffect(sync, [sync]);
 
