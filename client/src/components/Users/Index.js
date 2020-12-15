@@ -26,6 +26,7 @@ const UsersList = ({ users, sync }) => {
       fetcher(userUrl(id), { user: { admin } }, { method: 'PATCH' })
         .then((data) => {
           if (data.success) sync();
+          else setLoading(null);
           openSnack(data);
         })
         // Only update the state if the request fails, as it will be naturally
