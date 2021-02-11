@@ -62,12 +62,15 @@ class GamesController < ApplicationController
       err << "Unknown source of tracks"
     end
 
-    game, game_err = Game.create_one!(current_user, number_of_tracks, source, validator) if err.empty?
+    game, game_err, game_warning = Game.create_one!(current_user, number_of_tracks, source, validator) if err.empty?
     err << game_err if game_err
+
+    message = err.join(" ")
+    message = "Created game #{game&.slug}.#{game_warning}" if err.empty?
 
     render json: {
       success: err.empty?,
-      message: err.join(" ") || "Created game #{game&.slug}",
+      message: message,
       newGameSlug: game&.slug,
     }
   end

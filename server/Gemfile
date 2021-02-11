@@ -22,8 +22,8 @@ gem "redis", "~> 4.0"
 # gem 'bcrypt', '~> 3.1.7'
 
 # ActiveJobs queue
-gem "delayed_job_active_record"
 gem "daemons"
+gem "delayed_job_active_record"
 
 # require the rails-now, because we need the env for ENVied!
 gem "dotenv-rails", require: "dotenv/rails-now"

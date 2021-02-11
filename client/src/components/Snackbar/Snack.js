@@ -21,7 +21,12 @@ const Snack = ({ snack, setSnack }) => {
         onClose={closeSnack}
         severity={severity || 'success'}
       >
-        {message}
+        {message.split('\n').map((part, index) => (
+          <span key={index}>
+            {part}
+            <br />
+          </span>
+        ))}
       </Alert>
     </Snackbar>
   );
