@@ -13,7 +13,8 @@ class Track
   # FIXME: create this as part of a "provider" object
   # FIXME: some validation that these make sense
   def self.from_deezer(json)
-    json["title"] = json["title_short"]
+    # Use the short title if available.
+    json["title"] = json["title_short"] || json["title"]
     json["artist"] = json["artist"]["name"]
     json["cover_url"] = json["album"]["cover"]
     json["sample_url"] = json["preview"]
