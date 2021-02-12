@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import {
   Box,
   Card,
+  CardActions,
   CardMedia,
   CardContent,
   CardActionArea,
@@ -11,10 +12,17 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
+import PlaylistAnalysisDialog from './PlaylistAnalysisDialog';
+
 const useStyles = makeStyles((theme) => ({
   image: {
     height: 140,
     backgroundColor: theme.palette.text.secondary,
+  },
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
   selected: {
     borderColor: theme.palette.success.main,
@@ -24,23 +32,27 @@ const useStyles = makeStyles((theme) => ({
   fullHeight: {
     height: '100%',
   },
+  grow: {
+    flexGrow: 1,
+  },
   songs: {
     marginLeft: theme.spacing(1),
-  },
-  test: {
-    flexGrow: 1,
   },
 }));
 
 const CardForObject = ({ selected, object, action }) => {
-  const { title, description, picture, nb_tracks } = object;
+  const { title, description, picture, nb_tracks, unreadable_tracks } = object;
   const classes = useStyles();
   return (
     <Card
-      className={clsx(classes.fullHeight, selected && classes.selected)}
+      className={clsx(
+        classes.root,
+        classes.fullHeight,
+        selected && classes.selected
+      )}
       variant="outlined"
     >
-      <CardActionArea onClick={action} className={classes.fullHeight}>
+      <CardActionArea onClick={action} className={classes.grow}>
         <Box height="100%">
           <CardMedia
             className={classes.image}
@@ -58,10 +70,14 @@ const CardForObject = ({ selected, object, action }) => {
             {description.length > 0 && (
               <Typography variant="body2">{description}</Typography>
             )}
-            <div className={classes.test} />
           </CardContent>
         </Box>
       </CardActionArea>
+      {unreadable_tracks && unreadable_tracks.length !== 0 && (
+        <CardActions>
+          <PlaylistAnalysisDialog playlist={object} />
+        </CardActions>
+      )}
     </Card>
   );
 };

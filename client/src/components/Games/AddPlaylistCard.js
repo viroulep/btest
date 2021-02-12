@@ -62,6 +62,9 @@ const AddPlaylistCard = ({ playlists, setPlaylists }) => {
                 description: data['description'],
                 nb_tracks: data['nb_tracks'],
                 picture: data['picture'],
+                unreadable_tracks: data['tracks']['data']
+                  .filter((t) => !t['readable'])
+                  .map(({ id, title }) => ({ id, title })),
                 selected: true,
               };
               return newPlaylists;
