@@ -100,11 +100,10 @@ const NewGameForm = () => {
           // Nagivate to the list of available games
           history.push(`/games/${newGameSlug}`);
         } else {
-          setLoading(false);
+          openSnack({ message });
         }
-        openSnack({ success, message });
       })
-      .catch(() => setLoading(false));
+      .finally(() => setLoading(false));
   }, [history, openSnack, mix, playlists, selectedSource, setLoading, fetcher]);
 
   return (

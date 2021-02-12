@@ -39,33 +39,15 @@ class DeezerPlaylist < ApplicationRecord
   end
 
   def get_tracklist(quantity) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-    unreadable_by_tracklist = {}
     tracklists_data = playlists.map do |playlist|
       response = RestClient.get(playlist["tracklist"])
       data = JSON.parse(response.body)
-      # Partition readable/non-readable tracks
-      readable, unreadable = data["data"].partition { |track| track["readable"] }
-      if unreadable.any?
-        unreadable_by_tracklist[playlist["id"]] = {
-          size: unreadable.size,
-          title: playlist["title"],
-        }
-      end
-      # Return only readable tracks
-      readable
+      # Filter out non-readable tracks
+      data["data"].select { |track| track["readable"] }
     end
 
     quantity_available = tracklists_data.map(&:size).reduce(:+)
-    if quantity > quantity_available
-      return [
-        nil,
-        "There are not enough tracks in the playlists (it may be that the playlist"\
-        "is empty, or that all the tracks in the playlists are not available through Deezer's API)",
-      ]
-    end
-
-    # Clear out any playlist that may have ended up empty (due to unreadable tracks)
-    tracklists_data.select!(&:any?)
+    return [nil, "There are not enough tracks in the playlists"] if quantity > quantity_available
 
     picked = []
     # Shortcut if we have a single playlist source
@@ -79,19 +61,9 @@ class DeezerPlaylist < ApplicationRecord
       end
     end
 
-    # Craft a nice warning message if there were unreadable tracks.
-    warning = unreadable_by_tracklist.values.map do |playlist|
-      "  - #{playlist[:size]} from the playlist '#{playlist[:title]}'"
-    end.join("\n")
-    warning = if unreadable_by_tracklist.empty?
-                nil
-              else
-                "\nSome tracks in your playlist(s) are not able to be read through Deezer's API:\n#{warning}"
-              end
-
-    [Tracklist.from_deezer(picked), nil, warning]
+    [Tracklist.from_deezer(picked), nil]
   rescue RestClient::ExceptionWithResponse => e
-    [nil, e, nil]
+    [nil, e]
   end
 
   def to_json(*_args)

@@ -206,7 +206,7 @@ class Game < ApplicationRecord
   end
 
   def self.create_one!(creator, number_of_tracks, source, validator)
-    tracks, err, warning = source.get_tracklist(number_of_tracks)
+    tracks, err = source.get_tracklist(number_of_tracks)
     if err.nil?
       [Game.create!(
         slug: Game.generate_slug,
@@ -214,7 +214,7 @@ class Game < ApplicationRecord
         created_by: creator.id,
         sourceable: source,
         validator_name: validator,
-      ), nil, warning]
+      ), nil]
     else
       [nil, err] unless err.nil?
     end
