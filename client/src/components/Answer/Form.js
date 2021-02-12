@@ -75,6 +75,7 @@ const AnswerForm = ({ slug, currentTrack, currentAnswer }) => {
                 className: toUpper,
                 name: 'query',
                 ref: refTextField,
+                autocomplete: 'off',
               }}
               fullWidth
               value={value}
