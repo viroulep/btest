@@ -47,7 +47,16 @@ class DeezerPlaylist < ApplicationRecord
     end
 
     quantity_available = tracklists_data.map(&:size).reduce(:+)
-    return [nil, "There are not enough tracks in the playlists"] if quantity > quantity_available
+    if quantity > quantity_available
+      return [
+        nil,
+        "There are not enough tracks in the playlists (it may be that the playlist"\
+        "is empty, or that all the tracks in the playlists are not available through Deezer's API)",
+      ]
+    end
+
+    # Clear out any playlist that may have ended up empty (due to unreadable tracks)
+    tracklists_data.select!(&:any?)
 
     picked = []
     # Shortcut if we have a single playlist source

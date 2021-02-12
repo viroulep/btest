@@ -21,9 +21,9 @@ gem "redis", "~> 4.0"
 # Use Active Model has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
+gem "daemons"
 # ActiveJobs queue
 gem "delayed_job_active_record"
-gem "daemons"
 
 # require the rails-now, because we need the env for ENVied!
 gem "dotenv-rails", require: "dotenv/rails-now"
