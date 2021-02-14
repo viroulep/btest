@@ -1,2 +1,2 @@
 name "development"
-description "Environment used in development/test"
+description "Environment used in development"
