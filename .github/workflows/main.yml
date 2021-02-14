@@ -92,7 +92,7 @@ jobs:
         run: ci/scripts/tests_client.sh
   deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/head/master'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: tests
     container:
       image: ghcr.io/viroulep/btest:20210214
