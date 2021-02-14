@@ -1,6 +1,3 @@
-# FIXME: it would be nice to start the server somewhere here
-#"bin/rails s -p 8080 -b 0.0.0.0 &"
-#ps -efw |grep "puma"|grep -v grep|tr -s ' ' |cut -f 2 -d " "
 template "/home/btest/btest/server/.bundle/config" do
   source "bundle.erb"
   owner "btest"

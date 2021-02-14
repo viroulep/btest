@@ -1,6 +1,6 @@
 name: "CI"
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
@@ -11,41 +11,99 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+# Note: if this changes, also changes the hardcoded image tag later.
+# FIXME: unfortunately we can't use an environment variable when specifying
+# an image tag to use...
+# Maybe there is another way to not have to hardcode the value twice?
 env:
-  IMAGE_TAG: "20201201"
+  IMAGE_TAG: "20210214"
+  DOCKER_CLI_EXPERIMENTAL: "enabled"
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # FIXME: a deploy job if github.event == "push", and maybe that "needs" tests.
-  # TODO: also create a manual-only job to force-deploy? or just keep that manual
-  # This workflow contains a single job called "build"
+  # Set a variable with the image manifest, if found
+  check_docker_image:
+    runs-on: ubuntu-latest
+    outputs:
+      manifest: ${{ steps.get-manifest.outputs.manifest }}
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_PAT }}
+      - id: get-manifest
+        run: echo "::set-output name=manifest::$(docker manifest inspect ghcr.io/viroulep/btest:$IMAGE_TAG)"
+      # FIXME: remove this when the "deploy" stage is implemented
+      - name: coucou
+        run: |
+          echo ${{ github.ref }}
+          echo ${{ github.event_name }}
   build_docker_image:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    needs: check_docker_image
+    # It's a bit awkward, but we need "if" on all steps: if put on the job
+    # it will be skipped and "tests" will be skipped too.
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      - name: Check docker image exists
-        run: |
-          echo ${{ github.actor }}
-          manifest=$(curl -X GET https://docker.pkg.github.com/v2/viroulep/btest/btest/manifests/$IMAGE_TAG -u ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} | jq '.')
-          echo $manifest
-          echo ${{ github.action }}
-          echo ${{ github.event }}
-          echo ${{ github.event_name }}
-          echo ${{ github.ref }}
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+        if: needs.check_docker_image.outputs.manifest == ''
+      - uses: docker/setup-qemu-action@v1
+        if: needs.check_docker_image.outputs.manifest == ''
+      - uses: docker/setup-buildx-action@v1
+        if: needs.check_docker_image.outputs.manifest == ''
+      - name: Login to GitHub Container Registry
+        if: needs.check_docker_image.outputs.manifest == ''
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_PAT }}
+      # If manifest not found, build and publish the image.
+      - name: Build and push docker image
+        uses: docker/build-push-action@v2
+        if: needs.check_docker_image.outputs.manifest == ''
+        with:
+          context: ./ci
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/viroulep/btest:${{ env.IMAGE_TAG }}
+          cache-from: type=registry,ref=ghcr.io/viroulep/btest:${{ env.IMAGE_TAG }}
+          cache-to: type=inline
   tests:
-    # FIXME: docker image
     runs-on: ubuntu-latest
     needs: build_docker_image
-    # FIXME: run tests and upload client's build to artifacts
+    if: success() || cancelled()
+    container:
+      image: ghcr.io/viroulep/btest:20210214
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GH_PAT }}
     steps:
-      # Runs a single command using the runners shell
-      - name: Run the tests
-        run: echo Hello, world!
+      # For some ridiculous reason the file permission are not set up
+      # properly when using a custom container.
+      - name: Prepare filesystem
+        run: sudo chown -R $(whoami):$(whoami) `pwd`
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Run the server tests
+        run: ci/scripts/tests_server.sh
+      - name: Run the client tests
+        run: ci/scripts/tests_client.sh
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/head/master'
+    needs: tests
+    container:
+      image: ghcr.io/viroulep/btest:20210214
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GH_PAT }}
+    steps:
+      - name: Prepare filesystem
+        run: sudo chown -R $(whoami):$(whoami) `pwd`
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Deploy to prod
+        run: |
+          echo "TODO: get ssh key from secrets + ssh pull_deploy + yarn deploy"

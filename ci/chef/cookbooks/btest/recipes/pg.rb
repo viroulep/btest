@@ -10,7 +10,6 @@ user_exists=`sudo -u postgres psql -tAc "select 1 from pg_catalog.pg_roles where
 
 bash "create pg user 'btest'" do
   code <<-EOF
-    sudo -u btest echo 'export BTEST_DATABASE_PASSWORD=#{password}' >> /home/btest/btest/env/env-db
     sudo -u postgres psql -c "create role btest login password '#{password}' createdb;"
   EOF
   not_if { user_exists == "1" }
@@ -19,7 +18,7 @@ end
 
 template "/home/btest/btest/server/.env.local" do
   source "dotenv-local.erb"
-  not_if { user_exists == "1" }
+  not_if { user_exists == "1" || !production }
   variables ({ password: password })
   sensitive true
 end
