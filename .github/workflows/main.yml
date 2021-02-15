@@ -117,7 +117,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    needs: build_and_tests
+    needs: [build_docker_image, build_and_tests]
     container:
       image: ghcr.io/viroulep/btest:${{ needs.build_docker_image.outputs.image_tag }}
       credentials:
