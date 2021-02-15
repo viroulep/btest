@@ -87,6 +87,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - name: Run the server tests
+        # FIXME: use chef actually, since we can sudo :)
+        # this requires to carefully craft path in chef recipes
         run: ci/scripts/tests_server.sh
       - name: Run the client tests
         run: ci/scripts/tests_client.sh
@@ -104,6 +106,9 @@ jobs:
         run: sudo chown -R $(whoami):$(whoami) `pwd`
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      - name: Create key from secrets
+        run: echo "${{ secrets.CI_PRIVATE_KEY }}" >> ${GITHUB_WORKSPACE}/ssh_key
       - name: Deploy to prod
         run: |
-          echo "TODO: get ssh key from secrets + ssh pull_deploy + yarn deploy"
+          cd ${GITHUB_WORKSPACE}/client
+          yarn deploy --rsh="ssh -i ${GITHUB_WORKSPACE}/ssh_key"
