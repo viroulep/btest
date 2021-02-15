@@ -118,4 +118,4 @@ jobs:
         run: yarn deploy
       - name: Run pull_deploy on server
         working-directory: server
-        run: ssh btest@quizz.virouleau.fr scripts/deploy.sh pull_deploy
+        run: ssh btest@quizz.virouleau.fr btest/server/scripts/deploy.sh pull_deploy
