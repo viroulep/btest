@@ -22,6 +22,7 @@ env:
 jobs:
   # Set a variable with the image manifest, if found
   check_docker_image:
+    if: false
     runs-on: ubuntu-latest
     outputs:
       manifest: ${{ steps.get-manifest.outputs.manifest }}
@@ -40,6 +41,7 @@ jobs:
           echo ${{ github.ref }}
           echo ${{ github.event_name }}
   build_docker_image:
+    if: false
     runs-on: ubuntu-latest
     needs: check_docker_image
     # It's a bit awkward, but we need "if" on all steps: if put on the job
@@ -71,6 +73,7 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/viroulep/btest:${{ env.IMAGE_TAG }}
           cache-to: type=inline
   tests:
+    if: false
     runs-on: ubuntu-latest
     needs: build_docker_image
     container:
@@ -117,3 +120,27 @@ jobs:
       - name: Deploy client to prod
         working-directory: client
         run: yarn deploy
+  dep-test:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/viroulep/btest:20210215
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GH_PAT }}
+    env:
+      # GH actions overrides this when using a custom container :(
+      HOME: "/home/btest"
+    steps:
+      - name: Prepare filesystem
+        run: sudo chown -R $(whoami):$(whoami) `pwd`
+      # Checks-out the repository in $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+      - name: Create ssh keys and known hosts from secrets
+        run: |
+          mkdir -p $HOME/.ssh
+          echo "${{ secrets.CI_PRIVATE_KEY }}" >> $HOME/.ssh/id_rsa
+          chmod 600 $HOME/.ssh/id_rsa
+          ssh-keyscan -H quizz.virouleau.fr > $HOME/.ssh/known_hosts
+      - name: Remote ls
+        working-directory: client
+        run: ssh btest@quizz.virouleau.fr ls
