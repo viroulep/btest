@@ -31,8 +31,19 @@ user "btest" do
   shell "/bin/bash"
 end
 
+sudo_users = ["btest"]
+
+if node.chef_environment == "test"
+  user "github" do
+    comment "GitHub actions user"
+    shell "/bin/bash"
+    uid 1001
+  end
+  sudo_users << "github"
+end
+
 sudo "admin" do
-  user "btest"
+  user sudo_users
   nopasswd true
 end
 
