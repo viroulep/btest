@@ -22,6 +22,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "prebuild": "yarn install",
     "build": "react-scripts build",
     "test": "CI=true react-scripts test",
     "test:lint": "yarn run eslint src",
