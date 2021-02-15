@@ -11,20 +11,17 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Note: if this changes, also changes the hardcoded image tag later.
-# FIXME: unfortunately we can't use an environment variable when specifying
-# an image tag to use...
-# Maybe there is another way to not have to hardcode the value twice?
 env:
-  IMAGE_TAG: "20210215"
+  IMAGE_TAG: "20210216"
   DOCKER_CLI_EXPERIMENTAL: "enabled"
 
 jobs:
-  # Set a variable with the image manifest, if found
-  check_docker_image:
+  build_docker_image:
     runs-on: ubuntu-latest
     outputs:
-      manifest: ${{ steps.get-manifest.outputs.manifest }}
+      image_tag: ${{ steps.get-manifest.outputs.image_tag }}
+    # It's a bit awkward, but we need "if" on all steps: if put on the job
+    # it will be skipped and "tests" will be skipped too.
     steps:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
@@ -33,31 +30,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GH_PAT }}
       - id: get-manifest
-        run: echo "::set-output name=manifest::$(docker manifest inspect ghcr.io/viroulep/btest:$IMAGE_TAG)"
-  build_docker_image:
-    runs-on: ubuntu-latest
-    needs: check_docker_image
-    # It's a bit awkward, but we need "if" on all steps: if put on the job
-    # it will be skipped and "tests" will be skipped too.
-    steps:
+        run: |
+          echo "::set-output name=manifest::$(docker manifest inspect ghcr.io/viroulep/btest:$IMAGE_TAG)"
+          echo "::set-output name=image_tag::$IMAGE_TAG"
+          docker manifest inspect ghcr.io/viroulep/btest:$IMAGE_TAG | jq '.'
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-        if: needs.check_docker_image.outputs.manifest == ''
+        if: steps.get-manifest.outputs.manifest == ''
       - uses: docker/setup-qemu-action@v1
-        if: needs.check_docker_image.outputs.manifest == ''
+        if: steps.get-manifest.outputs.manifest == ''
       - uses: docker/setup-buildx-action@v1
-        if: needs.check_docker_image.outputs.manifest == ''
-      - name: Login to GitHub Container Registry
-        if: needs.check_docker_image.outputs.manifest == ''
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GH_PAT }}
+        if: steps.get-manifest.outputs.manifest == ''
       # If manifest not found, build and publish the image.
       - name: Build and push docker image
         uses: docker/build-push-action@v2
-        if: needs.check_docker_image.outputs.manifest == ''
+        if: steps.get-manifest.outputs.manifest == ''
         with:
           context: ./ci
           platforms: linux/amd64
@@ -65,12 +52,14 @@ jobs:
           tags: ghcr.io/viroulep/btest:${{ env.IMAGE_TAG }}
           cache-from: type=registry,ref=ghcr.io/viroulep/btest:${{ env.IMAGE_TAG }}
           cache-to: type=inline
-  tests:
+  build_and_tests:
     # FIXME: set HOME to the appropriate value and use cache for deps
     runs-on: ubuntu-latest
     needs: build_docker_image
     container:
-      image: ghcr.io/viroulep/btest:20210215
+      image: ghcr.io/viroulep/btest:${{ needs.build_docker_image.outputs.image_tag }}
+      # Ridiculous but necessary
+      options: --user 1001
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GH_PAT }}
@@ -79,23 +68,58 @@ jobs:
       # properly when using a custom container.
       - name: Prepare filesystem
         run: |
-          sudo chown -R $(whoami):$(whoami) `pwd`
-          sudo chown -R $(whoami):$(whoami) $HOME
+          whoami
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      # Since we have total control over the container image, maybe we can hardcode this
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          # Trick to allow for manual cache clear: https://github.com/actions/cache/issues/2#issuecomment-673493515
+          key: ${{ env.IMAGE_TAG }}-yarn-${{ secrets.CACHE_VERSION }}-${{ hashFiles('client/yarn.lock') }}
+          restore-keys: ${{ env.IMAGE_TAG }}-yarn-
+      # We explicitly use manual caching, despite warnings of the action not
+      # to do so.
+      # The ruby version is built in the image, so we avoid basically all issues
+      # that may arise by adding the image tag in the cache key.
+      - uses: actions/cache@v2
+        id: gems-cache
+        with:
+          path: server/vendor/bundle
+          key: ${{ env.IMAGE_TAG }}-gems-${{ secrets.CACHE_VERSION }}-${{ hashFiles('server/Gemfile.lock') }}
+          restore-keys: ${{ env.IMAGE_TAG }}-gems-
+      - name: Run the client tests
+        working-directory: client
+        run: |
+          yarn install
+          yarn test
+          yarn test:lint
+          yarn build
+          # FIXME: set this as an output; just do the rsync in the next step
       - name: Run the server tests
+        env:
+          BUNDLE_PATH: vendor/bundle
+          BUNDLE_JOBS: 3
+          RAILS_ENV: test
+        working-directory: server
         # FIXME: use chef actually, since we can sudo :)
         # this requires to carefully craft path in chef recipes
-        run: ci/scripts/tests_server.sh
-      - name: Run the client tests
-        run: ci/scripts/tests_client.sh
-        # FIXME: set this as an output; just do the rsync in the next step
+        run: |
+          service postgresql status || sudo service postgresql start
+          bundle install
+          bundle exec rubocop
+          bin/rails db:reset
+          bin/rails test test
   deploy:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    needs: tests
+    needs: build_and_tests
     container:
-      image: ghcr.io/viroulep/btest:20210215
+      image: ghcr.io/viroulep/btest:${{ needs.build_docker_image.outputs.image_tag }}
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GH_PAT }}

@@ -22,6 +22,8 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   username: btest
   password: <%= ENVied.BTEST_DATABASE_PASSWORD %>
+  # Set the host to match postgresql rule for identification
+  host: 127.0.0.1
 
 development:
   <<: *default
