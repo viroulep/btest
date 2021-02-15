@@ -102,12 +102,16 @@ jobs:
         password: ${{ secrets.GH_PAT }}
     steps:
       - name: Prepare filesystem
-        run: sudo chown -R $(whoami):$(whoami) `pwd`
+        run: |
+          sudo chown -R $(whoami):$(whoami) `pwd`
+          sudo chown -R $(whoami):$(whoami) $HOME
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: Create key from secrets
-        run: echo "${{ secrets.CI_PRIVATE_KEY }}" >> ${GITHUB_WORKSPACE}/ssh_key
-      - name: Deploy to prod
+      - name: Create ssh keys and known hosts from secrets
         run: |
-          cd ${GITHUB_WORKSPACE}/client
-          yarn deploy --rsh="ssh -i ${GITHUB_WORKSPACE}/ssh_key"
+          mkdir -p $HOME/.ssh
+          echo "${{ secrets.CI_PRIVATE_KEY }}" >> $HOME/.ssh/id_rsa
+          ssh-keyscan -H quizz.virouleau.fr > $HOME/.ssh/known_hosts
+      - name: Deploy client to prod
+        working-directory: ${GITHUB_WORKSPACE}/client
+        run: yarn deploy
