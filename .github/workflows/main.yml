@@ -34,11 +34,6 @@ jobs:
           password: ${{ secrets.GH_PAT }}
       - id: get-manifest
         run: echo "::set-output name=manifest::$(docker manifest inspect ghcr.io/viroulep/btest:$IMAGE_TAG)"
-      # FIXME: remove this when the "deploy" stage is implemented
-      - name: coucou
-        run: |
-          echo ${{ github.ref }}
-          echo ${{ github.event_name }}
   build_docker_image:
     runs-on: ubuntu-latest
     needs: check_docker_image
@@ -94,6 +89,7 @@ jobs:
         run: ci/scripts/tests_server.sh
       - name: Run the client tests
         run: ci/scripts/tests_client.sh
+        # FIXME: set this as an output; just do the rsync in the next step
   deploy:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -120,3 +116,6 @@ jobs:
       - name: Deploy client to prod
         working-directory: client
         run: yarn deploy
+      - name: Run pull_deploy on server
+        working-directory: server
+        run: ssh btest@quizz.virouleau.fr scripts/deploy.sh pull_deploy
