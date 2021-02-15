@@ -16,7 +16,7 @@ on:
 # an image tag to use...
 # Maybe there is another way to not have to hardcode the value twice?
 env:
-  IMAGE_TAG: "20210214"
+  IMAGE_TAG: "20210215"
   DOCKER_CLI_EXPERIMENTAL: "enabled"
 
 jobs:
@@ -73,9 +73,8 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     needs: build_docker_image
-    if: success() || cancelled()
     container:
-      image: ghcr.io/viroulep/btest:20210214
+      image: ghcr.io/viroulep/btest:20210215
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GH_PAT }}
@@ -97,7 +96,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: tests
     container:
-      image: ghcr.io/viroulep/btest:20210214
+      image: ghcr.io/viroulep/btest:20210215
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GH_PAT }}

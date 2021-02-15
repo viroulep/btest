@@ -20,6 +20,7 @@ apt_package %w(git
                postgresql
                screen
                rsync
+               openssh-client
                man-db
                )
 
