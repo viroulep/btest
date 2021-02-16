@@ -33,7 +33,6 @@ jobs:
         run: |
           echo "::set-output name=manifest::$(docker manifest inspect ghcr.io/viroulep/btest:$IMAGE_TAG)"
           echo "::set-output name=image_tag::$IMAGE_TAG"
-          docker manifest inspect ghcr.io/viroulep/btest:$IMAGE_TAG | jq '.'
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         if: steps.get-manifest.outputs.manifest == ''
@@ -53,7 +52,6 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/viroulep/btest:${{ env.IMAGE_TAG }}
           cache-to: type=inline
   build_and_tests:
-    # FIXME: set HOME to the appropriate value and use cache for deps
     runs-on: ubuntu-latest
     needs: build_docker_image
     container:
