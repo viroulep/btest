@@ -100,6 +100,12 @@ jobs:
           yarn test:lint
           yarn build
           # FIXME: set this as an output; just do the rsync in the next step
+          #https://github.com/actions/upload-artifact
+          #https://github.com/actions/download-artifact
+      - uses: actions/upload-artifact@v2
+        with:
+          name: client-build
+          path: client/build
       - name: Run the server tests
         env:
           BUNDLE_PATH: vendor/bundle
@@ -116,30 +122,21 @@ jobs:
           bin/rails test test
   deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: [build_docker_image, build_and_tests]
-    container:
-      image: ghcr.io/viroulep/btest:${{ needs.build_docker_image.outputs.image_tag }}
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GH_PAT }}
-    env:
-      # GH actions overrides this when using a custom container :(
-      HOME: "/home/btest"
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
-      - name: Prepare filesystem
-        run: sudo chown -R $(whoami):$(whoami) `pwd`
       # Checks-out the repository in $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
       - name: Create ssh keys and known hosts from secrets
         run: |
           mkdir -p $HOME/.ssh
           echo "${{ secrets.CI_PRIVATE_KEY }}" >> $HOME/.ssh/id_rsa
           chmod 600 $HOME/.ssh/id_rsa
           ssh-keyscan -H quizz.virouleau.fr > $HOME/.ssh/known_hosts
-      - name: Deploy client to prod
-        working-directory: client
-        run: yarn deploy
+      - uses: actions/download-artifact@v2
+        with:
+          name: client-build
+          path: build
+      - name: Deploy client build to server
+        run: rsync -avh --delete build/ btest@quizz.virouleau.fr:/home/btest/btest/client/build
       - name: Run pull_deploy on server
-        working-directory: server
         run: ssh btest@quizz.virouleau.fr btest/server/scripts/deploy.sh pull_deploy
