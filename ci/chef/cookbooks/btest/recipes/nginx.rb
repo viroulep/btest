@@ -16,7 +16,7 @@ template main_conf do
   source "nginx.erb"
 end
 
-certificate_file = "/etc/letsencrypt/live/quizz.virouleau.fr/privkey.pem"
+certificate_file = "/etc/letsencrypt/live/www.f2l.org/privkey.pem"
 
 unless ::File.exist?(certificate_file)
   template "/etc/nginx/conf.d/pre_certif.conf" do
@@ -46,8 +46,8 @@ unless ::File.exist?(certificate_file)
   bash "get SSL certificate if needed" do
     code <<-EOF
     set -e
-    certbot #{certbot_common_args} -w /home/btest/btest/server/public -d quizz-api.virouleau.fr
-    certbot #{certbot_common_args} -w /home/btest/btest/client/build -d quizz.virouleau.fr
+    certbot #{certbot_common_args} -w /home/btest/btest/server/public -d api.f2l.org
+    certbot #{certbot_common_args} -w /home/btest/btest/client/build -d www.f2l.org
     rm -rf /etc/nginx/conf.d/pre_certif.conf
     EOF
   end

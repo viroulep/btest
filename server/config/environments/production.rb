@@ -37,7 +37,7 @@ Rails.application.configure do
   # config.action_cable.mount_path = nil
   # config.action_cable.url = 'wss://example.com/cable'
   # FIXME: get this from env
-  config.action_cable.allowed_request_origins = ["https://quizz.virouleau.fr"]
+  config.action_cable.allowed_request_origins = ["https://www.f2l.org"]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true

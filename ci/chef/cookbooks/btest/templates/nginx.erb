@@ -2,10 +2,24 @@ upstream app {
   server unix:/tmp/puma.sock fail_timeout=0;
 }
 
+# naked to https www
+server {
+  listen 80;
+  server_name f2l.org;
+  return 301 https://www.$server_name$request_uri;
+}
+server {
+  listen 443;
+  server_name f2l.org;
+  include certif_client.conf;
+  include use_https.conf;
+  return 301 https://www.$server_name$request_uri;
+}
+
 # FIXME: take the domain names from data_bags/environment?
 # the client server
 server {
-  server_name quizz.virouleau.fr;
+  server_name www.f2l.org;
 
   listen 443;
 
@@ -31,9 +45,9 @@ server {
   root /home/btest/btest/client/build;
 }
 
-# the real www https server!
+# the api server
 server {
-  server_name quizz-api.virouleau.fr;
+  server_name api.f2l.org;
 
   listen 443;
 

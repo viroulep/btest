@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_TAG: "20210216"
+  IMAGE_TAG: "20210323"
   DOCKER_CLI_EXPERIMENTAL: "enabled"
 
 jobs:
@@ -129,12 +129,12 @@ jobs:
           mkdir -p $HOME/.ssh
           echo "${{ secrets.CI_PRIVATE_KEY }}" >> $HOME/.ssh/id_rsa
           chmod 600 $HOME/.ssh/id_rsa
-          ssh-keyscan -H quizz.virouleau.fr > $HOME/.ssh/known_hosts
+          ssh-keyscan -H f2l.org > $HOME/.ssh/known_hosts
       - uses: actions/download-artifact@v2
         with:
           name: client-build
           path: build
       - name: Deploy client build to server
-        run: rsync -avh --delete build/ btest@quizz.virouleau.fr:/home/btest/btest/client/build
+        run: rsync -avh --delete build/ btest@f2l.org:/home/btest/btest/client/build
       - name: Run pull_deploy on server
-        run: ssh btest@quizz.virouleau.fr btest/server/scripts/deploy.sh pull_deploy
+        run: ssh btest@f2l.org btest/server/scripts/deploy.sh pull_deploy

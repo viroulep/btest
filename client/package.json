@@ -28,7 +28,7 @@
     "test:lint": "yarn run eslint src",
     "eject": "react-scripts eject",
     "predeploy": "yarn run build",
-    "deploy": "rsync -avh --delete build/ btest@quizz.virouleau.fr:/home/btest/btest/client/build"
+    "deploy": "rsync -avh --delete build/ btest@f2l.org:/home/btest/btest/client/build"
   },
   "browserslist": {
     "production": [
