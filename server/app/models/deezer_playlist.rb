@@ -25,6 +25,7 @@ class DeezerPlaylist < ApplicationRecord
       new_playlist.playlists << {
         "id" => data["id"],
         "title" => data["title"],
+        "nb_tracks" => data["nb_tracks"],
         "description" => data["description"],
         "tracklist" => data["tracklist"],
       }
@@ -40,7 +41,11 @@ class DeezerPlaylist < ApplicationRecord
 
   def get_tracklist(quantity) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     tracklists_data = playlists.map do |playlist|
-      response = RestClient.get(playlist["tracklist"])
+      # By default deezer gives only 25 tracks.
+      # If available, set the nb_tracks as the limit, with an arbitrary upper
+      # bound to 200.
+      limit = [playlist["nb_tracks"] || 25, 200].min
+      response = RestClient.get(playlist["tracklist"], { params: { limit: limit } })
       data = JSON.parse(response.body)
       # Filter out non-readable tracks
       data["data"].select { |track| track["readable"] }
